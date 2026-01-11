@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chauffer (Pyodide) - Book a Driver</title>
+
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #0b1220; color: #e8eefc; }
+    header { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); background: rgba(11,18,32,0.7); border-bottom: 1px solid rgba(255,255,255,0.10); }
+    .bar { max-width: 1100px; margin: 0 auto; padding: 14px 18px; display:flex; align-items:center; justify-content: space-between; }
+    .brand { display:flex; gap: 10px; align-items:center; font-weight: 800; }
+    .brand .dot { width: 10px; height: 10px; border-radius: 999px; background: #2b6cff; }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 18px; }
+    .hero { display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 16px; align-items: start; }
+    @media (max-width: 980px) { .hero { grid-template-columns: 1fr; } }
+
+    .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    p { margin: 6px 0 14px; color: rgba(232,238,252,0.80); }
+
+    .tabs { display:flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .tab { padding: 10px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.16); background: rgba(0,0,0,0.18); color: rgba(232,238,252,0.9); cursor: pointer; }
+    .tab.active { background: #2b6cff; border-color: rgba(43,108,255,0.9); color: white; }
+
+    label { display:block; font-size: 13px; margin: 10px 0 6px; color: rgba(232,238,252,0.85); }
+    input { width: 100%; box-sizing: border-box; padding: 12px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.16); background: rgba(0,0,0,0.25); color: #e8eefc; outline: none; }
+    input:focus { border-color: rgba(116,165,255,0.7); }
+
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 680px) { .grid2 { grid-template-columns: 1fr; } }
+
+    button { cursor: pointer; border: 0; border-radius: 10px; padding: 12px 14px; font-weight: 650; }
+    .primary { background: #2b6cff; color: white; }
+    .secondary { background: rgba(255,255,255,0.10); color: #e8eefc; border: 1px solid rgba(255,255,255,0.16); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    #map { width: 100%; height: 420px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.20); }
+
+    .kpis { display:flex; gap: 10px; flex-wrap: wrap; }
+    .kpi { flex: 1; min-width: 160px; background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 12px; }
+    .kpi .label { font-size: 12px; color: rgba(232,238,252,0.7); }
+    .kpi .value { font-size: 16px; font-weight: 750; margin-top: 4px; }
+
+    .msg { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12); min-height: 20px; }
+    .note { margin-top: 12px; color: rgba(232,238,252,0.65); font-size: 12px; line-height: 1.35; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+
+  <!-- Pyodide (Python in the browser) -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"></script>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="brand"><span class="dot"></span><span>Chauffer</span></div>
+      <div style="opacity:0.85; font-size: 13px;">Pyodide demo</div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="card">
+        <h1>Your Car. Our Trusted Driver.</h1>
+        <p>Select pickup & drop location, date/time and trip type.</p>
+
+        <div class="tabs" id="tripTabs">
+          <button class="tab active" type="button" data-type="one_way">One Way</button>
+          <button class="tab" type="button" data-type="round_trip">Round Trip</button>
+          <button class="tab" type="button" data-type="hourly">Hourly</button>
+          <button class="tab" type="button" data-type="after_party">After Party</button>
+        </div>
+
+        <label for="pickup">Pickup</label>
+        <input id="pickup" type="text" placeholder="Enter pickup location" autocomplete="off" />
+
+        <label for="drop">Drop</label>
+        <input id="drop" type="text" placeholder="Enter drop location" autocomplete="off" />
+
+        <div class="grid2">
+          <div>
+            <label for="date">Date</label>
+            <input id="date" type="date" />
+          </div>
+          <div>
+            <label for="time">Time</label>
+            <input id="time" type="time" />
+          </div>
+        </div>
+
+        <div style="display:flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;">
+          <button id="routeBtn" class="secondary" type="button" disabled>Show Route</button>
+          <button id="findBtn" class="primary" type="button" disabled>Find Drivers</button>
+        </div>
+
+        <div class="kpis" style="margin-top: 12px;">
+          <div class="kpi"><div class="label">Distance</div><div class="value" id="dist">—</div></div>
+          <div class="kpi"><div class="label">Duration</div><div class="value" id="dur">—</div></div>
+          <div class="kpi"><div class="label">Estimated fare</div><div class="value" id="fare">—</div></div>
+        </div>
+
+        <div id="msg" class="msg">Loading Pyodide…</div>
+
+        <div class="note">
+          Security note: decrypting a Google Maps key in the browser is not secure (the key is still exposed to users). If you want this protected, decrypt server-side and only serve it to authenticated users.
+        </div>
+      </div>
+
+      <div>
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    function setMsg(text) { $("msg").textContent = text; }
+
+    // Matches encrypt_keys.py defaults
+    const GMAPS_KEY_ENCRYPTED = "Qs5skmSuUzGSs5TwYxnoazaHLEgJ995LrvyyWiziwWdIzkyAfrYq";
+    const PASSPHRASE = "default_salt_2024";
+
+    // Trip type tabs
+    let tripType = "one_way";
+    $("tripTabs").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-type]");
+      if (!btn) return;
+      tripType = btn.getAttribute("data-type");
+      for (const el of $("tripTabs").querySelectorAll(".tab")) el.classList.remove("active");
+      btn.classList.add("active");
+    });
+
+    let pyodide;
+    async function initPy() {
+      pyodide = await loadPyodide();
+      await pyodide.runPythonAsync(`
+import base64, hashlib
+
+def decrypt_key(encrypted_data: str, passphrase: str = "default_salt_2024") -> str:
+    encrypted_bytes = base64.b64decode(encrypted_data)
+    key_hash = hashlib.sha256(passphrase.encode()).digest()
+    decrypted = bytearray()
+    for i, b in enumerate(encrypted_bytes):
+        decrypted.append(b ^ key_hash[i % len(key_hash)])
+    return decrypted.decode("utf-8")
+
+def estimate_fare(distance_km: float, duration_min: float, trip_type: str) -> float:
+    base = 149.0
+    per_km = 18.0
+    per_min = 2.5
+
+    multiplier = 1.0
+    if trip_type == "round_trip":
+        multiplier = 1.35
+    elif trip_type == "hourly":
+        multiplier = 1.15
+    elif trip_type == "after_party":
+        multiplier = 1.25
+
+    fare = (base + (per_km * max(distance_km, 0.0)) + (per_min * max(duration_min, 0.0))) * multiplier
+    return round(fare, 0)
+`);
+    }
+
+    function loadGoogleMaps(key) {
+      return new Promise((resolve, reject) => {
+        if (window.google && window.google.maps) return resolve();
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Failed to load Google Maps"));
+        document.head.appendChild(script);
+      });
+    }
+
+    function fmtKm(meters) { return `${(meters / 1000).toFixed(2)} km`; }
+    function fmtMin(seconds) { return `${Math.round(seconds / 60)} min`; }
+
+    let map, directionsService, directionsRenderer;
+    let pickupAutocomplete, dropAutocomplete;
+    let pickupPlace = null;
+    let dropPlace = null;
+
+    function updateButtons() {
+      const ok = !!(pickupPlace && dropPlace);
+      $("routeBtn").disabled = !ok;
+      $("findBtn").disabled = !ok;
+    }
+
+    async function computeAndRenderRoute(render) {
+      if (!pickupPlace || !dropPlace) throw new Error("Select both pickup and drop from suggestions");
+
+      const request = {
+        origin: pickupPlace.geometry.location,
+        destination: dropPlace.geometry.location,
+        travelMode: google.maps.TravelMode.DRIVING,
+      };
+
+      const res = await directionsService.route(request);
+      const leg = res.routes?.[0]?.legs?.[0];
+      if (!leg) throw new Error("No route found");
+
+      $("dist").textContent = leg.distance?.text || fmtKm(leg.distance?.value || 0);
+      $("dur").textContent = leg.duration?.text || fmtMin(leg.duration?.value || 0);
+
+      const distanceKm = (leg.distance?.value || 0) / 1000;
+      const durationMin = (leg.duration?.value || 0) / 60;
+
+      const fare = await pyodide.runPythonAsync(`estimate_fare(${distanceKm}, ${durationMin}, "${tripType}")`);
+      $("fare").textContent = `₹${fare}`;
+
+      if (render) directionsRenderer.setDirections(res);
+      return { distanceKm, durationMin };
+    }
+
+    async function init() {
+      try {
+        setMsg("Initializing Pyodide…");
+        await initPy();
+
+        setMsg("Decrypting Maps key…");
+        const key = await pyodide.runPythonAsync(`decrypt_key("${GMAPS_KEY_ENCRYPTED}", "${PASSPHRASE}")`);
+        if (!key || typeof key !== "string") throw new Error("Failed to decrypt Maps key");
+
+        setMsg("Loading Google Maps…");
+        await loadGoogleMaps(key);
+
+        map = new google.maps.Map($("map"), {
+          center: { lat: 12.9716, lng: 77.5946 },
+          zoom: 12,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({ map, suppressMarkers: false });
+
+        pickupAutocomplete = new google.maps.places.Autocomplete($("pickup"));
+        dropAutocomplete = new google.maps.places.Autocomplete($("drop"));
+
+        pickupAutocomplete.addListener("place_changed", () => {
+          pickupPlace = pickupAutocomplete.getPlace();
+          updateButtons();
+        });
+        dropAutocomplete.addListener("place_changed", () => {
+          dropPlace = dropAutocomplete.getPlace();
+          updateButtons();
+        });
+
+        updateButtons();
+        setMsg("Ready.");
+      } catch (e) {
+        setMsg(e.message || String(e));
+      }
+    }
+
+    $("routeBtn").addEventListener("click", async () => {
+      try {
+        setMsg("Calculating route…");
+        await computeAndRenderRoute(true);
+        setMsg("Route updated.");
+      } catch (e) {
+        setMsg(e.message || String(e));
+      }
+    });
+
+    $("findBtn").addEventListener("click", async () => {
+      try {
+        setMsg("Calculating estimate…");
+        await computeAndRenderRoute(false);
+        setMsg("Estimate ready. Next step would be driver selection.");
+      } catch (e) {
+        setMsg(e.message || String(e));
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

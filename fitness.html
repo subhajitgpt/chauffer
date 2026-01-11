@@ -1,0 +1,4399 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FitFirst Time-Crunch Fitness Analyzer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap & Icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --ff-red: #e3063b;
+      --ff-red-dark: #a1042b;
+      --ff-dark: #111827;
+      --ff-bg: #020617;
+      --ff-card: #0b1120;
+      --ff-card-soft: #020617;
+      --ff-muted: #9ca3af;
+      --ff-accent: #22c55e;
+      --ff-border: #1f2937;
+      --ff-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      background:
+        radial-gradient(circle at 0 0, #1f2937 0, #020617 45%) fixed,
+        radial-gradient(circle at 100% 100%, #111827 0, #020617 40%) fixed;
+      color: #f9fafb;
+    }
+
+    a { text-decoration: none; }
+
+    /* Top Nav */
+    .ff-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.9),
+        rgba(15, 23, 42, 0.92)
+      );
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .ff-nav-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .ff-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ff-logo-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #fecaca, #b91c1c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: 0 0 0 2px rgba(248, 250, 252, 0.08);
+    }
+
+    .ff-logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .ff-logo-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+
+    .ff-logo-text span:last-child {
+      font-size: 11px;
+      color: var(--ff-muted);
+      text-transform: uppercase;
+    }
+
+    .ff-nav-links {
+      display: flex;
+      gap: 18px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .ff-nav-links a {
+      color: #e5e7eb;
+      opacity: 0.85;
+    }
+
+    .ff-nav-links a:hover {
+      opacity: 1;
+      color: #fff;
+    }
+
+    .ff-nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ff-nav-cta span {
+      font-size: 11px;
+      color: var(--ff-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .ff-btn-nav {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: linear-gradient(to right, var(--ff-red), var(--ff-red-dark));
+      color: #fff;
+      box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);
+    }
+
+    .ff-btn-nav:hover { filter: brightness(1.08); }
+
+    /* Layout */
+
+    .ff-main {
+      max-width: 1180px;
+      margin: 22px auto 40px;
+      padding: 0 16px 240px;
+    }
+
+    .ff-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 22px;
+    }
+
+    @media (max-width: 960px) {
+      .ff-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* Hero */
+
+    .ff-hero-card {
+      background: radial-gradient(circle at top left, #1f2937 0, #020617 55%);
+      border-radius: var(--radius-lg);
+      padding: 22px 22px 18px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: var(--ff-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ff-hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(22, 163, 74, 0.12);
+      border: 1px solid rgba(22, 163, 74, 0.4);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #bbf7d0;
+      margin-bottom: 8px;
+    }
+
+    .ff-hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+    }
+
+    .ff-hero-highlight {
+      color: var(--ff-red);
+    }
+
+    .ff-hero-sub {
+      font-size: 13px;
+      color: var(--ff-muted);
+      max-width: 480px;
+    }
+
+    .ff-hero-metrics {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .ff-hero-pill {
+      min-width: 120px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(55, 65, 81, 0.85);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 11px;
+    }
+
+    .ff-pill-label {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ff-muted);
+    }
+
+    .ff-pill-value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .ff-pill-subvalue {
+      font-size: 11px;
+      color: #a5b4fc;
+    }
+
+    .ff-hero-footer {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--ff-muted);
+    }
+
+    .ff-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--ff-red);
+      display: inline-block;
+      margin: 0 5px;
+    }
+
+    .ff-chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 4px 9px;
+      font-size: 11px;
+      color: #e5e7eb;
+    }
+
+    /* Analyzer card */
+
+    .ff-card-block {
+      background: var(--ff-card);
+      border-radius: var(--radius-lg);
+      padding: 18px 18px 16px;
+      border: 1px solid var(--ff-border);
+      box-shadow: var(--ff-shadow);
+    }
+
+    .ff-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .ff-card-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ff-card-sub {
+      font-size: 11px;
+      color: var(--ff-muted);
+    }
+
+    .ff-badge-soft {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--ff-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .ff-form-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ff-muted);
+      margin-bottom: 4px;
+    }
+
+    .ff-input {
+      background: #020617;
+      border-radius: 10px;
+      border: 1px solid #374151;
+      padding: 6px 10px;
+      color: #e5e7eb;
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .ff-input:focus {
+      outline: none;
+      border-color: var(--ff-red);
+      box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.5);
+    }
+
+    .ff-slider {
+      width: 100%;
+    }
+
+    .ff-btn-primary {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      background: linear-gradient(to right, var(--ff-red), var(--ff-red-dark));
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.5);
+    }
+
+    .ff-btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .ff-share-btn {
+      width: 100%;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, #25d366, #128c7e);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    }
+
+    .ff-share-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
+    }
+
+    .ff-share-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .ff-share-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .ff-share-btn i {
+      font-size: 16px;
+    }
+
+    .ff-ml-explain {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(79, 70, 229, 0.05));
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 8px;
+    }
+
+    .ff-ml-models {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .ff-model-badge {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 8px;
+      padding: 6px 10px;
+      text-align: center;
+    }
+
+    .ff-model-name {
+      display: block;
+      font-size: 10px;
+      color: rgba(165, 180, 252, 0.8);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .ff-model-value {
+      display: block;
+      font-size: 16px;
+      font-weight: 700;
+      color: rgba(165, 180, 252, 1);
+    }
+
+    .ff-feature-impacts {
+      font-size: 12px;
+    }
+
+    .ff-impact-label {
+      color: rgba(203, 213, 225, 0.9);
+      font-weight: 600;
+      font-size: 11px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .ff-impact-item {
+      padding: 4px 8px;
+      margin: 3px 0;
+      border-radius: 6px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ff-impact-positive {
+      background: rgba(34, 197, 94, 0.12);
+      border-left: 3px solid rgba(34, 197, 94, 0.6);
+      color: rgba(134, 239, 172, 0.95);
+    }
+
+    .ff-impact-negative {
+      background: rgba(239, 68, 68, 0.12);
+      border-left: 3px solid rgba(239, 68, 68, 0.6);
+      color: rgba(252, 165, 165, 0.95);
+    }
+
+    .ff-small {
+      font-size: 11px;
+      color: var(--ff-muted);
+    }
+
+    .ff-whoop-upload {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.05));
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .ff-whoop-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .ff-file-input {
+      display: none;
+    }
+
+    .ff-file-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(22, 163, 74, 0.08));
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      border-radius: 8px;
+      color: #22c55e;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .ff-file-label:hover {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(22, 163, 74, 0.12));
+      border-color: rgba(34, 197, 94, 0.5);
+    }
+
+    .ff-file-label.has-file {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(37, 99, 235, 0.08));
+      border-color: rgba(59, 130, 246, 0.4);
+      color: #3b82f6;
+    }
+
+    .ff-file-clear {
+      padding: 8px 12px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 8px;
+      color: #ef4444;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .ff-file-clear:hover {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .ff-whoop-date-range {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .ff-form-label-sm {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(226, 232, 240, 0.85);
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .ff-input-sm {
+      width: 100%;
+      padding: 6px 10px;
+      background: rgba(2, 6, 23, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      border-radius: 8px;
+      color: #f1f5f9;
+      font-size: 12px;
+      transition: border 0.2s;
+      cursor: pointer;
+    }
+
+    .ff-input-sm:focus {
+      outline: none;
+      border-color: var(--ff-accent);
+    }
+
+    .ff-input-sm::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      filter: invert(1);
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .ff-input-sm::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+
+    /* Results */
+
+    .ff-score-ring {
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      border: 4px solid rgba(55, 65, 81, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-weight: 800;
+      font-size: 26px;
+    }
+
+    .ff-score-ring-inner {
+      width: 96px;
+      height: 96px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, #1f2937, #020617);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .ff-score-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ff-muted);
+    }
+
+    .ff-score-band {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+
+    .ff-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 4px;
+    }
+
+    .ff-mini-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 4px 9px;
+      font-size: 11px;
+      color: #d1d5db;
+    }
+
+    .ff-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .ff-list li {
+      margin-bottom: 6px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .ff-list li i {
+      margin-top: 3px;
+      color: var(--ff-accent);
+    }
+
+    .ff-section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ff-muted);
+      margin-bottom: 4px;
+    }
+
+    .ff-chip-band {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+
+    .ff-chip-overloaded {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.6);
+    }
+
+    .ff-chip-tight {
+      background: rgba(234, 179, 8, 0.1);
+      color: #fef9c3;
+      border: 1px solid rgba(234, 179, 8, 0.7);
+    }
+
+    .ff-chip-sustainable {
+      background: rgba(22, 163, 74, 0.12);
+      color: #bbf7d0;
+      border: 1px solid rgba(22, 163, 74, 0.6);
+    }
+
+    .ff-chip-thriving {
+      background: rgba(59, 130, 246, 0.15);
+      color: #bfdbfe;
+      border: 1px solid rgba(59, 130, 246, 0.7);
+    }
+
+    .ff-mini-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .ff-mini-metric {
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 82px;
+    }
+
+    .ff-mini-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ff-muted);
+    }
+
+    .ff-mini-value {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .ff-mini-note {
+      font-size: 11px;
+      color: rgba(226, 232, 240, 0.78);
+    }
+
+    /* FitAI Coach */
+
+    .ff-ai-card {
+      background:
+        linear-gradient(150deg, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.97)),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.08), transparent 60%);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.42);
+      box-shadow: 0 32px 70px rgba(0, 0, 0, 0.78);
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 430px;
+      max-width: calc(100% - 32px);
+      z-index: 200;
+      backdrop-filter: blur(20px);
+    }
+
+    .ff-ai-card.hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .ff-ai-card {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        width: auto;
+      }
+    }
+
+    .ff-ai-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .ff-ai-header > div:first-child {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ff-ai-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ff-ai-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .ff-ai-model {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 3px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--ff-muted);
+    }
+
+    .ff-ai-min-btn {
+      background: transparent;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+      color: var(--ff-muted);
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: border 0.2s, color 0.2s;
+    }
+
+    .ff-ai-min-btn:hover {
+      color: #fff;
+      border-color: #fff;
+    }
+
+    .ff-ai-launcher {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, var(--ff-red), var(--ff-red-dark));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 18px 40px rgba(220, 38, 38, 0.45);
+      z-index: 190;
+    }
+
+    .ff-ai-launcher.show {
+      display: inline-flex;
+    }
+
+    @media (max-width: 768px) {
+      .ff-ai-launcher {
+        left: 16px;
+        right: auto;
+      }
+    }
+
+    .ff-ai-body {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .ff-ai-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ff-ai-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ff-muted);
+    }
+
+    .ff-ai-chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      background: rgba(15, 23, 42, 0.65);
+      color: #e2e8f0;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border 0.2s ease, color 0.2s ease, background 0.2s ease;
+    }
+
+    .ff-ai-chip i {
+      font-size: 12px;
+    }
+
+    .ff-ai-chip:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .ff-ai-chip:not(:disabled):hover {
+      border-color: var(--ff-accent);
+      color: var(--ff-accent);
+    }
+
+    .ff-ai-chip.ready:not(:disabled) {
+      background: rgba(34, 197, 94, 0.12);
+      border-color: rgba(34, 197, 94, 0.55);
+      color: #34d399;
+    }
+
+    .ff-ai-chip.danger:not(:disabled) {
+      background: rgba(220, 38, 38, 0.15);
+      border-color: rgba(248, 113, 113, 0.55);
+      color: #f87171;
+    }
+
+    .ff-ai-chip.neutral:not(:disabled) {
+      background: rgba(59, 130, 246, 0.12);
+      border-color: rgba(96, 165, 250, 0.55);
+      color: #93c5fd;
+    }
+
+    .ff-ai-textarea {
+      width: 100%;
+      min-height: 70px;
+      background: rgba(2, 6, 23, 0.9);
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #f1f5f9;
+      line-height: 1.55;
+      resize: vertical;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    .ff-ai-textarea:focus {
+      outline: none;
+      border-color: var(--ff-accent);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.42);
+    }
+
+    .ff-ai-textarea.ff-ai-context {
+      min-height: 80px;
+    }
+
+    .ff-ai-textarea.ff-ai-question {
+      min-height: 120px;
+      max-height: 240px;
+    }
+
+    .ff-ai-hint {
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.85);
+      letter-spacing: 0.03em;
+    }
+
+    .ff-ai-response-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .ff-ai-response {
+      font-size: 13px;
+      line-height: 1.62;
+      background:
+        linear-gradient(170deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.96));
+      border-radius: 18px;
+      border: 1px solid rgba(71, 85, 105, 0.9);
+      padding: 16px 18px;
+      max-height: 260px;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ff-chat-user-msg {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 18px 18px 4px 18px;
+      max-width: 75%;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .ff-chat-assistant-msg {
+      position: relative;
+      align-self: flex-start;
+      background: linear-gradient(135deg, rgba(51, 65, 85, 0.95), rgba(30, 41, 59, 0.98));
+      color: rgba(226, 232, 240, 0.96);
+      padding: 12px 26px 10px 14px;
+      border-radius: 18px 18px 18px 4px;
+      max-width: 85%;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      border: 1px solid rgba(71, 85, 105, 0.6);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      font-size: 13px;
+      line-height: 1.62;
+    }
+
+    .ff-chat-assistant-text {
+      white-space: pre-wrap;
+    }
+
+    .ff-chat-copy-btn {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      background: transparent;
+      border: none;
+      color: rgba(148, 163, 184, 0.9);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+    }
+
+    .ff-chat-copy-btn:hover {
+      color: rgba(248, 250, 252, 0.95);
+    }
+
+    .ff-chat-copy-btn.copied {
+      color: #4ade80;
+    }
+
+    .ff-chat-assistant-text p {
+      margin: 0 0 6px;
+    }
+
+    .ff-chat-assistant-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .ff-chat-assistant-text ul.ff-ai-list {
+      margin: 4px 0 6px 1.1em;
+      padding-left: 0.6em;
+    }
+
+    .ff-chat-assistant-text ul.ff-ai-list li {
+      margin-bottom: 3px;
+    }
+
+    .ff-ai-response:empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: rgba(226, 232, 240, 0.7);
+    }
+
+    .ff-ai-response:empty::before {
+      content: "⚡ Welcome to FitAI. Ask about habits, recovery, or time-saving routines.";
+      max-width: 260px;
+      line-height: 1.5;
+    }
+
+    .ff-ai-response.typing {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 0 0 1px rgba(34, 197, 94, 0.25);
+    }
+
+    .ff-ai-response.typing::after {
+      content: "";
+      width: 6px;
+      height: 1.1em;
+      border-radius: 2px;
+      background: linear-gradient(180deg, var(--ff-accent), #16a34a);
+      display: inline-block;
+      margin-left: 4px;
+      animation: ff-caret 0.75s steps(1) infinite;
+      vertical-align: bottom;
+    }
+
+    .ff-ai-quick {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ff-ai-quick-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ff-ai-status-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding-top: 6px;
+    }
+
+    .ff-ai-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .ff-ai-question-wrap .ff-ai-textarea {
+      flex: 1 1 auto;
+    }
+
+    .ff-ai-send-btn {
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--ff-red), var(--ff-red-dark));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 0 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: filter 0.2s ease;
+    }
+
+    .ff-ai-send-btn i {
+      font-size: 13px;
+    }
+
+    .ff-ai-send-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      filter: grayscale(0.2);
+    }
+
+    .ff-ai-send-btn:not(:disabled):hover {
+      filter: brightness(1.08);
+    }
+
+    @keyframes ff-caret {
+      0%,
+      50% {
+        opacity: 1;
+      }
+      51%,
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .ff-status {
+      font-size: 11px;
+      color: var(--ff-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ff-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #f97316;
+    }
+
+    .ff-status-dot.ok { background: #22c55e; }
+    .ff-status-dot.err { background: #ef4444; }
+
+    .ff-badge-warning {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 3px 8px;
+      background: rgba(234, 179, 8, 0.12);
+      color: #facc15;
+      border: 1px solid rgba(234, 179, 8, 0.6);
+    }
+
+    .ff-badge-ghost {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 2px 7px;
+      border: 1px dashed rgba(148, 163, 184, 0.6);
+      color: var(--ff-muted);
+    }
+
+    /* Main Tabs */
+    .ff-tabbar {
+      display: inline-flex;
+      gap: 6px;
+      padding: 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(2, 6, 23, 0.65);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      margin: 14px 0 18px;
+    }
+
+    .ff-tab {
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+      background: transparent;
+      cursor: pointer;
+      opacity: 0.85;
+    }
+
+    .ff-tab:hover { opacity: 1; }
+
+    .ff-tab.active {
+      opacity: 1;
+      background: linear-gradient(to right, rgba(227, 6, 59, 0.9), rgba(161, 4, 43, 0.95));
+      box-shadow: 0 10px 25px rgba(220, 38, 38, 0.35);
+    }
+
+    .ff-tab-panel { display: none; }
+    .ff-tab-panel.active { display: block; }
+
+    /* Shop */
+    .ff-shop-hero {
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(227, 6, 59, 0.08), rgba(2, 6, 23, 0.65));
+      box-shadow: var(--ff-shadow);
+      padding: 22px 20px;
+    }
+
+    .ff-shop-kicker {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      font-weight: 800;
+      color: rgba(248, 250, 252, 0.8);
+      text-transform: uppercase;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .ff-shop-title {
+      font-weight: 800;
+      font-size: clamp(26px, 3vw, 40px);
+      margin: 0 0 8px;
+    }
+
+    .ff-shop-sub {
+      margin: 0;
+      color: var(--ff-muted);
+      max-width: 62ch;
+    }
+
+    .ff-shop-cats {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    @media (max-width: 992px) {
+      .ff-shop-cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .ff-shop-cat {
+      text-align: left;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(2, 6, 23, 0.7);
+      padding: 12px 12px;
+      color: #f9fafb;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 72px;
+    }
+
+    .ff-shop-cat:hover {
+      transform: translateY(-1px);
+      border-color: rgba(248, 113, 113, 0.55);
+    }
+
+    .ff-shop-cat.active {
+      border-color: rgba(248, 113, 113, 0.8);
+      box-shadow: 0 12px 30px rgba(220, 38, 38, 0.18);
+    }
+
+    .ff-shop-cat-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .ff-shop-cat-sub {
+      font-size: 11px;
+      color: var(--ff-muted);
+    }
+
+    .ff-shop-grid {
+      margin-top: 16px;
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    @media (max-width: 992px) {
+      .ff-shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 520px) {
+      .ff-shop-grid { grid-template-columns: 1fr; }
+    }
+
+    .ff-product-card {
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(11, 17, 32, 0.86);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .ff-product-img {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background: rgba(2, 6, 23, 0.8);
+    }
+
+    .ff-product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.02);
+      transition: transform 0.25s ease;
+      filter: saturate(1.05);
+    }
+
+    .ff-product-card:hover .ff-product-img img { transform: scale(1.08); }
+
+    .ff-product-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1px solid rgba(248, 250, 252, 0.2);
+      background: rgba(2, 6, 23, 0.65);
+      backdrop-filter: blur(10px);
+    }
+
+    .ff-product-tag.best { border-color: rgba(250, 204, 21, 0.55); color: #facc15; }
+    .ff-product-tag.new { border-color: rgba(34, 197, 94, 0.55); color: #22c55e; }
+    .ff-product-tag.premium { border-color: rgba(99, 102, 241, 0.55); color: #a5b4fc; }
+
+    .ff-product-body {
+      padding: 14px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .ff-product-cat {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      font-weight: 800;
+      color: rgba(156, 163, 175, 0.95);
+      text-transform: uppercase;
+    }
+
+    .ff-product-name {
+      font-weight: 800;
+      font-size: 15px;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .ff-product-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(229, 231, 235, 0.95);
+      font-size: 12px;
+    }
+
+    .ff-stars { color: #facc15; letter-spacing: 1px; }
+    .ff-rating-count { color: var(--ff-muted); }
+
+    .ff-product-price {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .ff-price {
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+    }
+
+    .ff-compare {
+      font-size: 13px;
+      color: rgba(156, 163, 175, 0.9);
+      text-decoration: line-through;
+    }
+
+    .ff-btn-secondary {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      background: rgba(2, 6, 23, 0.7);
+      color: #e5e7eb;
+    }
+
+    .ff-btn-secondary:hover { border-color: rgba(248, 113, 113, 0.6); }
+
+    .ff-btn-ghost {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: transparent;
+      color: rgba(229, 231, 235, 0.95);
+    }
+
+    .ff-btn-ghost:hover { border-color: rgba(148, 163, 184, 0.45); }
+
+    .ff-cart-bar {
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(2, 6, 23, 0.55);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .ff-cart-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .ff-cart-title {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: rgba(248, 250, 252, 0.86);
+    }
+
+    .ff-cart-sub {
+      font-size: 12px;
+      color: var(--ff-muted);
+    }
+
+    .ff-cart-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .ff-cart-list {
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(11, 17, 32, 0.7);
+      padding: 12px 14px;
+      display: none;
+    }
+
+    .ff-cart-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      align-items: center;
+    }
+
+    .ff-cart-row:last-child { border-bottom: 0; }
+
+    .ff-cart-item-name {
+      font-weight: 800;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .ff-cart-item-sub {
+      font-size: 12px;
+      color: var(--ff-muted);
+      margin-top: 2px;
+    }
+
+    .ff-qty {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .ff-qty button {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(2, 6, 23, 0.65);
+      color: rgba(229, 231, 235, 0.95);
+      font-weight: 900;
+    }
+
+    .ff-qty span {
+      min-width: 22px;
+      text-align: center;
+      font-weight: 800;
+      color: rgba(229, 231, 235, 0.95);
+    }
+
+    .ff-product-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ff-btn-add {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(2, 6, 23, 0.7);
+      color: rgba(229, 231, 235, 0.95);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .ff-btn-add:hover { border-color: rgba(248, 113, 113, 0.6); }
+
+    .ff-pill-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(2, 6, 23, 0.55);
+      color: rgba(229, 231, 235, 0.95);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .ff-badge-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(227, 6, 59, 0.85);
+      border: 1px solid rgba(227, 6, 59, 0.9);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header class="ff-nav">
+    <div class="ff-nav-inner">
+      <div class="ff-logo">
+        <div class="ff-logo-mark">F1</div>
+        <div class="ff-logo-text">
+          <span>FitFirst</span>
+          <span>Time-Crunch Analyzer</span>
+        </div>
+      </div>
+      <nav class="ff-nav-links d-none d-md-flex">
+        <a href="#analyzer">Analyzer</a>
+        <a href="#plan">Micro-Habits</a>
+        <a href="#coach">FitAI Coach</a>
+        <a href="#shop">Shop</a>
+      </nav>
+      <div class="ff-nav-cta d-none d-md-flex">
+        <span>For working professionals</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="ff-main">
+    <div class="ff-tabbar" role="tablist" aria-label="Main tabs">
+      <button
+        type="button"
+        class="ff-tab active"
+        id="ffTabAnalyzer"
+        data-ff-tab-target="analyzer"
+        aria-controls="ffPanelAnalyzer"
+        aria-selected="true"
+      >
+        Analyzer
+      </button>
+      <button
+        type="button"
+        class="ff-tab"
+        id="ffTabShop"
+        data-ff-tab-target="shop"
+        aria-controls="ffPanelShop"
+        aria-selected="false"
+      >
+        Shop
+      </button>
+    </div>
+
+    <section
+      class="ff-tab-panel active"
+      id="ffPanelAnalyzer"
+      data-ff-tab-panel="analyzer"
+      aria-labelledby="ffTabAnalyzer"
+    >
+    <!-- HERO + ANALYZER -->
+    <div class="ff-grid" id="analyzer">
+      <!-- Left: Hero + Form -->
+      <div>
+        <section class="ff-hero-card mb-3">
+          <div class="ff-hero-tag">
+            <i class="fa-solid fa-briefcase-clock"></i>
+            <span>Built for 60-hour work weeks</span>
+          </div>
+          <h1 class="ff-hero-title">
+            Time-Crunch <span class="ff-hero-highlight">Fitness Analyzer</span>
+          </h1>
+          <p class="ff-hero-sub">
+            A data-science engine that turns your workday chaos into a
+            <strong>micro-habit fitness plan</strong>. No gyms, no 2-hour routines —
+            just science-backed 3–10 minute blocks that fit into your schedule.
+          </p>
+
+          <div class="ff-hero-metrics">
+            <div class="ff-hero-pill">
+              <span class="ff-pill-label">Daily Time Budget</span>
+              <span class="ff-pill-value" id="heroTimeBudget">–</span>
+              <span class="ff-pill-subvalue">Minutes you can realistically invest</span>
+            </div>
+            <div class="ff-hero-pill">
+              <span class="ff-pill-label">Time-Crunch Index</span>
+              <span class="ff-pill-value" id="heroIndex">–</span>
+              <span class="ff-pill-subvalue" id="heroIndexLabel">Run analyzer to see</span>
+            </div>
+            <div class="ff-hero-pill">
+              <span class="ff-pill-label">Micro-Habits</span>
+              <span class="ff-pill-value" id="heroHabits">–</span>
+              <span class="ff-pill-subvalue">Tiny actions, compound results</span>
+            </div>
+          </div>
+
+          <div class="ff-hero-footer">
+            <span class="ff-chip">
+              <i class="fa-solid fa-flask me-1"></i> Live insights engine
+            </span>
+            <span class="ff-chip d-none d-sm-inline">
+              <i class="fa-solid fa-robot me-1"></i> FitAI Coach – instant guidance
+            </span>
+          </div>
+        </section>
+
+        <section class="ff-card-block">
+          <div class="ff-card-header">
+            <div>
+              <div class="ff-card-title">
+                <i class="fa-solid fa-sliders"></i> Your Workday Inputs
+              </div>
+              <div class="ff-card-sub">
+                We simulate your week to compute a <strong>Time-Crunch Fitness
+                Score</strong> personalized to your schedule.
+              </div>
+            </div>
+            <span class="ff-badge-soft">
+              <i class="fa-solid fa-microchip"></i> Live Analysis Ready
+            </span>
+          </div>
+
+          <form id="fitnessForm">
+            <div class="row g-3">
+              <div class="col-6">
+                <label class="ff-form-label">Age</label>
+                <input
+                  type="number"
+                  min="18"
+                  max="80"
+                  step="1"
+                  class="ff-input"
+                  id="age"
+                  value="35"
+                />
+              </div>
+              <div class="col-6">
+                <label class="ff-form-label">BMI (approx)</label>
+                <input
+                  type="number"
+                  min="16"
+                  max="40"
+                  step="0.5"
+                  class="ff-input"
+                  id="bmi"
+                  value="27"
+                />
+              </div>
+
+              <div class="col-md-4">
+                <label class="ff-form-label">Work hours / day</label>
+                <input
+                  type="number"
+                  min="4"
+                  max="16"
+                  step="0.5"
+                  class="ff-input"
+                  id="work_hours"
+                  value="9"
+                />
+                <div class="ff-small">Office + meetings</div>
+              </div>
+              <div class="col-md-4">
+                <label class="ff-form-label">Commute (mins / day)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="180"
+                  step="5"
+                  class="ff-input"
+                  id="commute_minutes"
+                  value="60"
+                />
+                <div class="ff-small">Door to door</div>
+              </div>
+              <div class="col-md-4">
+                <label class="ff-form-label">Sitting time (hrs / day)</label>
+                <input
+                  type="number"
+                  min="4"
+                  max="16"
+                  step="0.5"
+                  class="ff-input"
+                  id="sitting_hours"
+                  value="9"
+                />
+                <div class="ff-small">Laptop + TV + phone</div>
+              </div>
+
+              <div class="col-md-4">
+                <label class="ff-form-label">Workouts / week</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="7"
+                  step="1"
+                  class="ff-input"
+                  id="weekly_workouts"
+                  value="2"
+                />
+                <div class="ff-small">Gym, walk, sports, etc.</div>
+              </div>
+              <div class="col-md-4">
+                <label class="ff-form-label">Avg sleep (hrs / night)</label>
+                <input
+                  type="number"
+                  min="4"
+                  max="10"
+                  step="0.5"
+                  class="ff-input"
+                  id="avg_sleep"
+                  value="6.5"
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="ff-form-label">Stress level</label>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  step="1"
+                  class="ff-slider"
+                  id="stress_level"
+                  value="3"
+                />
+                <div class="ff-small">
+                  <span id="stressLabel">Moderate</span> stress
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="ff-form-label">Screen time after 9pm (hrs)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="6"
+                  step="0.5"
+                  class="ff-input"
+                  id="late_screen"
+                  value="2"
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="ff-form-label">Uninterrupted blocks / day</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="6"
+                  step="1"
+                  class="ff-input"
+                  id="free_blocks"
+                  value="2"
+                />
+                <div class="ff-small">
+                  10–20 minute slots where you control your time
+                </div>
+              </div>
+            </div>
+
+            <!-- WHOOP Data Upload (Optional) -->
+            <div class="row g-3 mt-2">
+              <div class="col-12">
+                <div class="ff-whoop-upload">
+                  <label class="ff-form-label">
+                    <i class="fa-solid fa-heart-pulse"></i> WHOOP Data (Optional)
+                  </label>
+                  <div class="ff-whoop-input-wrapper">
+                    <input
+                      type="file"
+                      id="whoopFileInput"
+                      class="ff-file-input"
+                      accept=".csv"
+                    />
+                    <label for="whoopFileInput" class="ff-file-label">
+                      <i class="fa-solid fa-upload"></i>
+                      <span id="whoopFileName">Upload WHOOP CSV</span>
+                    </label>
+                    <button
+                      type="button"
+                      id="clearWhoopBtn"
+                      class="ff-file-clear"
+                      style="display: none;"
+                    >
+                      <i class="fa-solid fa-times"></i>
+                    </button>
+                  </div>
+                  <div class="ff-small mt-1">
+                    <span id="whoopStatus">Upload your WHOOP data export to enhance recovery & strain scoring</span>
+                  </div>
+                  
+                  <!-- Date Range Filter -->
+                  <div class="ff-whoop-date-range" id="whoopDateRange" style="display: none;">
+                    <div class="row g-2 mt-2">
+                      <div class="col-md-6">
+                        <label class="ff-form-label-sm">From Date</label>
+                        <input
+                          type="date"
+                          id="whoopStartDate"
+                          class="ff-input-sm"
+                        />
+                      </div>
+                      <div class="col-md-6">
+                        <label class="ff-form-label-sm">To Date</label>
+                        <input
+                          type="date"
+                          id="whoopEndDate"
+                          class="ff-input-sm"
+                        />
+                      </div>
+                    </div>
+                    <div class="ff-small mt-1">
+                      <i class="fa-solid fa-info-circle"></i>
+                      <span id="whoopDateInfo">Select date range to filter cycles</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <button
+                type="button"
+                id="runAnalysisBtn"
+                class="ff-btn-primary"
+                disabled
+              >
+                <i class="fa-solid fa-play me-1"></i> Run Analysis
+              </button>
+              <span class="ff-small" id="pyodideStatus">
+                <i class="fa-solid fa-circle-notch fa-spin me-1"></i>
+                Preparing your analysis…
+              </span>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <!-- Right: Results + FitAI -->
+      <div>
+        <section class="ff-card-block mb-3" id="plan">
+          <div class="ff-card-header">
+            <div>
+              <div class="ff-card-title">
+                <i class="fa-solid fa-chart-line"></i> Analytics Summary
+              </div>
+              <div class="ff-card-sub">
+                Time-Crunch Fitness Score, bottlenecks, and a <strong>micro-habit
+                schedule</strong> tuned for working professionals.
+              </div>
+            </div>
+            <span class="ff-badge-soft" id="bandBadge">
+              <i class="fa-solid fa-hourglass-half"></i> No run yet
+            </span>
+          </div>
+
+          <div class="row g-3 align-items-stretch">
+            <div class="col-sm-4 d-flex justify-content-center">
+              <div class="ff-score-ring">
+                <div class="ff-score-ring-inner">
+                  <div class="ff-score-label">Score</div>
+                  <div id="scoreNumber">–</div>
+                  <div class="ff-score-label">/ 100</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-8 d-flex flex-column justify-content-between">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="ff-section-label">Band</div>
+                  <div id="scoreBandText">Run analyzer to classify your week</div>
+                </div>
+                <div>
+                  <div class="ff-section-label">Daily time budget</div>
+                  <div id="scoreBudgetText">–</div>
+                </div>
+              </div>
+
+              <div class="ff-pill-row mt-2">
+                <span class="ff-mini-pill">
+                  <i class="fa-solid fa-moon me-1"></i>
+                  Sleep efficiency: <span id="pillSleep">–</span>
+                </span>
+                <span class="ff-mini-pill">
+                  <i class="fa-solid fa-chair me-1"></i>
+                  Sedentary load: <span id="pillSedentary">–</span>
+                </span>
+                <span class="ff-mini-pill">
+                  <i class="fa-solid fa-person-running me-1"></i>
+                  Activity index: <span id="pillActivity">–</span>
+                </span>
+              </div>
+
+              <!-- Compact momentum metrics row using the blank area -->
+              <div class="ff-pill-row mt-2">
+                <span class="ff-mini-pill">
+                  <i class="fa-solid fa-arrow-trend-up me-1"></i>
+                    Weekly trend: <span id="weeklyTrendPill">–</span>
+                </span>
+                <span class="ff-mini-pill">
+                  <i class="fa-solid fa-heart-pulse me-1"></i>
+                    Recovery balance: <span id="recoveryScorePill">–</span>
+                </span>
+                <span class="ff-mini-pill">
+                  <i class="fa-solid fa-bullseye me-1"></i>
+                    Focus blocks: <span id="focusBlocksPill">–</span>
+                </span>
+              </div>
+
+              <div class="mt-3">
+                <div class="ff-section-label">Primary bottlenecks</div>
+                <ul class="ff-list" id="bottleneckList">
+                  <li><i class="fa-regular fa-circle"></i>
+                    <span>No analysis yet.</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div class="mt-3">
+                <div class="ff-section-label">
+                  <i class="fa-solid fa-brain"></i> Score Explainability
+                </div>
+                <div class="ff-ml-explain" id="mlExplainSection" style="display: none;">
+                  <div class="ff-feature-impacts">
+                    <div class="ff-impact-label">Top Contributing Factors:</div>
+                    <div id="topPositiveImpacts"></div>
+                    <div class="ff-impact-label mt-2">Top Limiting Factors:</div>
+                    <div id="topNegativeImpacts"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-3">
+                <button
+                  type="button"
+                  id="shareWhatsappBtn"
+                  class="ff-share-btn"
+                  disabled
+                >
+                  <i class="fa-brands fa-whatsapp"></i>
+                  <span>Share with Coach</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <hr class="mt-3 mb-2" />
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="ff-section-label">Micro-Habit Plan (sample day)</div>
+              <ul class="ff-list" id="habitPlanList">
+                <li><i class="fa-regular fa-circle"></i>Run analyzer to generate a
+                  plan with 3–10 minute blocks.</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <div class="ff-section-label">Daily Quick Wins</div>
+              <ul class="ff-list" id="quickWinList">
+                <li><i class="fa-regular fa-circle"></i>
+                  <span>Run the analyzer to unlock fast, actionable suggestions here.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="ff-section-label mt-3">Momentum Metrics</div>
+          <div class="ff-mini-metric-grid">
+            <div class="ff-mini-metric">
+              <span class="ff-mini-label">Weekly Trend</span>
+              <span class="ff-mini-value" id="weeklyTrendText">–</span>
+              <span class="ff-mini-note">Projected using your current score trajectory.</span>
+            </div>
+            <div class="ff-mini-metric">
+              <span class="ff-mini-label">Recovery Balance</span>
+              <span class="ff-mini-value" id="recoveryScoreText">–</span>
+              <span class="ff-mini-note">How sleep, stress, and screen time interact.</span>
+            </div>
+            <div class="ff-mini-metric">
+              <span class="ff-mini-label">Focus Blocks</span>
+              <span class="ff-mini-value" id="focusBlocksText">–</span>
+              <span class="ff-mini-note">Protected pockets you can redirect toward movement.</span>
+            </div>
+            <div class="ff-mini-metric">
+              <span class="ff-mini-label">Screen Wind-Down</span>
+              <span class="ff-mini-value" id="screenHabitText">–</span>
+              <span class="ff-mini-note">Late-night screen load and suggested cutoff.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="ff-ai-card hidden" id="coach">
+          <div class="ff-ai-header">
+            <div>
+              <div class="ff-ai-title">
+                <i class="fa-solid fa-robot"></i> FitAI Coach
+              </div>
+              <div class="ff-card-sub">
+                Time-optimised guidance for busy professionals.
+              </div>
+            </div>
+            <div class="ff-ai-controls">
+              <button type="button" class="ff-ai-chip neutral" id="copyLastAiBtn">
+                <i class="fa-regular fa-copy"></i>
+                <span>Copy last</span>
+              </button>
+              <button type="button" class="ff-ai-chip neutral" id="resetAiBtn">
+                <i class="fa-solid fa-rotate"></i>
+                <span>Reset</span>
+              </button>
+              <div class="ff-ai-model">
+                <i class="fa-solid fa-brain me-1"></i> FitAI Core
+              </div>
+              <button
+                type="button"
+                class="ff-ai-min-btn"
+                id="aiCollapseBtn"
+                aria-label="Minimize FitAI"
+              >
+                <i class="fa-solid fa-minus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="ff-ai-input-row">
+            <textarea
+              class="ff-ai-textarea ff-ai-question"
+              id="aiPrompt"
+              placeholder="Ask FitAI how to stay on track during a 60-hour workweek..."
+            ></textarea>
+            <button
+              class="ff-ai-send-btn"
+              type="button"
+              id="aiAskBtn"
+              disabled
+            >
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>Send</span>
+            </button>
+          </div>
+
+          <div class="ff-ai-quick">
+            <span class="ff-ai-label">Quick context</span>
+            <div class="ff-ai-quick-buttons">
+              <button type="button" class="ff-ai-chip" id="insertContextBtn" disabled>
+                <i class="fa-solid fa-bolt"></i>
+                <span>Insert summary</span>
+              </button>
+              <button type="button" class="ff-ai-chip" id="clearContextBtn" disabled>
+                <i class="fa-solid fa-eraser"></i>
+                <span>Clear all</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="ff-ai-response-wrapper">
+            <div class="ff-ai-response" id="aiResponse"></div>
+          </div>
+
+          <div class="ff-ai-status-row">
+            <button type="button" class="ff-ai-chip danger" id="stopResponseBtn" disabled>
+              <i class="fa-solid fa-stop"></i>
+              <span>Stop</span>
+            </button>
+            <div class="ff-status" id="aiStatus">
+              <span class="ff-status-dot"></span>
+              <span>Waiting for secure setup</span>
+            </div>
+          </div>
+
+          <div class="ff-ai-tip">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span>Tip: Use context buttons to add current analysis data to your message.</span>
+          </div>
+        </section>
+        <button
+          type="button"
+          class="ff-ai-launcher show"
+          id="aiLauncherBtn"
+          aria-label="Open FitAI Coach"
+        >
+          <i class="fa-solid fa-robot"></i> FitAI Coach
+        </button>
+      </div>
+    </div>
+
+    </section>
+
+    <section
+      class="ff-tab-panel"
+      id="ffPanelShop"
+      data-ff-tab-panel="shop"
+      aria-labelledby="ffTabShop"
+    >
+      <div class="ff-shop-hero" id="shop">
+        <div class="ff-shop-kicker">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span>Shop</span>
+        </div>
+        <h1 class="ff-shop-title">Fuel Your Fitness</h1>
+        <p class="ff-shop-sub">
+          Premium supplements, equipment, and apparel to power your training. Everything you need to keep your momentum.
+        </p>
+      </div>
+
+      <div class="ff-shop-cats" id="shopCategoryBar" aria-label="Shop categories"></div>
+
+      <div class="ff-cart-bar" aria-label="Cart summary">
+        <div class="ff-cart-meta">
+          <div class="ff-cart-title">Cart</div>
+          <div class="ff-cart-sub">
+            <span class="ff-pill-mini"><i class="fa-solid fa-cart-shopping"></i> Items <span class="ff-badge-count" id="cartCount">0</span></span>
+            <span class="ms-2">Total: <strong id="cartTotal">₹0.00</strong></span>
+          </div>
+        </div>
+        <div class="ff-cart-actions">
+          <button type="button" class="ff-btn-ghost" id="cartToggleBtn">
+            View Cart
+          </button>
+          <button type="button" class="ff-btn-secondary" id="cartClearBtn">
+            Clear
+          </button>
+          <button type="button" class="ff-btn-primary" id="cartCheckoutBtn">
+            <i class="fa-solid fa-credit-card me-1"></i> Checkout
+          </button>
+        </div>
+      </div>
+
+      <div class="ff-shop-grid" id="shopGrid" aria-live="polite"></div>
+
+      <div class="ff-cart-list" id="cartPanel" aria-label="Cart items"></div>
+
+      <div class="text-center mt-4">
+        <button type="button" class="ff-btn-secondary" id="shopLoadMoreBtn">
+          Load More Products
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pyodide -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.0/full/pyodide.js"></script>
+
+  <!-- Razorpay Checkout (used by Shop tab) -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <script>
+    // ========= CONFIG: ENCRYPTED OPENAI KEY (from your Python helper) =========
+    // After running your helper:
+    //   encrypted_openai = encrypt_key(openai_key, passphrase)
+    // paste here:
+    const OPENAI_KEY_ENCRYPTED = "cOw7g0W4eGXznpOpZzSoOFmOIm04p+lSkou0OhHs9D1LxWarB5lzePb5ss9QHLpgM5w9TQu9xmagjqUtGv/+BG3lXsJgk1oA8orawWIylTpUvw81L6jveoKPlCtUy8AmbekhmX3uIhrCkZrZExCBemLlCXNY87VUh5e/NBfo0DtM/nzHYbxQfOD5h8dKL5ZPVr03dgup2HPxj5IBC/f1BjLgIrI="; // e.g. "Q3h2...=="
+    const OPENAI_PASSPHRASE = "default_salt_2024"; // change if you used custom
+
+    // ========= CONFIG: RAZORPAY (HTML-only Checkout) =========
+    // Use Razorpay Dashboard -> Settings -> API Keys
+    // IMPORTANT: This is the *public* Key ID (safe to expose). Never put Key Secret in HTML.
+    // Example (test): "rzp_test_************"
+    const RAZORPAY_KEY_ID = "rzp_test_R6m7F3hsZzwZB6";
+
+    // ========= XOR + SHA256 + base64 DECRYPTION (matches your Python helper) =========
+    function base64ToBytes(b64) {
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) {
+        bytes[i] = bin.charCodeAt(i);
+      }
+      return bytes;
+    }
+
+    async function decryptOpenAIKey() {
+      if (!OPENAI_KEY_ENCRYPTED) {
+        throw new Error("No encrypted OpenAI key configured.");
+      }
+      const encBytes = base64ToBytes(OPENAI_KEY_ENCRYPTED);
+      const encoder = new TextEncoder();
+      const passBytes = encoder.encode(OPENAI_PASSPHRASE);
+      const hashBuf = await crypto.subtle.digest("SHA-256", passBytes);
+      const hash = new Uint8Array(hashBuf);
+      const out = new Uint8Array(encBytes.length);
+      for (let i = 0; i < encBytes.length; i++) {
+        out[i] = encBytes[i] ^ hash[i % hash.length];
+      }
+      const decoder = new TextDecoder();
+      return decoder.decode(out);
+    }
+
+    // ========= Pyodide SETUP & PYTHON ANALYTICS =========
+    let pyodideReadyPromise = null;
+    let lastAnalyticsText = "";
+    let typingInterval = null;
+    let isStreaming = false;
+    let currentAbortController = null;
+    let currentStreamingText = "";
+    let whoopData = null;
+
+    const promptInput = document.getElementById("aiPrompt");
+    const insertContextBtn = document.getElementById("insertContextBtn");
+    const clearContextBtn = document.getElementById("clearContextBtn");
+    const stopResponseBtn = document.getElementById("stopResponseBtn");
+    const resetAiBtn = document.getElementById("resetAiBtn");
+    const copyLastAiBtn = document.getElementById("copyLastAiBtn");
+    const askBtnEl = document.getElementById("aiAskBtn");
+    const aiCard = document.getElementById("coach");
+    const collapseBtn = document.getElementById("aiCollapseBtn");
+    const launcherBtn = document.getElementById("aiLauncherBtn");
+
+    // WHOOP file upload handlers
+    const whoopFileInput = document.getElementById("whoopFileInput");
+    const whoopFileName = document.getElementById("whoopFileName");
+    const whoopStatus = document.getElementById("whoopStatus");
+    const clearWhoopBtn = document.getElementById("clearWhoopBtn");
+    const whoopDateRange = document.getElementById("whoopDateRange");
+    const whoopStartDate = document.getElementById("whoopStartDate");
+    const whoopEndDate = document.getElementById("whoopEndDate");
+    const whoopDateInfo = document.getElementById("whoopDateInfo");
+
+    if (whoopFileInput) {
+      whoopFileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        whoopFileName.textContent = file.name;
+        whoopFileName.parentElement.classList.add("has-file");
+        clearWhoopBtn.style.display = "block";
+        whoopStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing WHOOP data...';
+
+        try {
+          const text = await file.text();
+          whoopData = parseWhoopCSV(text);
+          
+          // Show date range filter and set default dates
+          if (whoopDateRange) {
+            whoopDateRange.style.display = "block";
+            
+            // Set default to last 30 days from the most recent date
+            if (whoopData.cycles.length > 0) {
+              const dates = whoopData.cycles.map(c => new Date(c.date)).filter(d => !isNaN(d));
+              if (dates.length > 0) {
+                const maxDate = new Date(Math.max(...dates));
+                const minDate = new Date(maxDate);
+                minDate.setDate(minDate.getDate() - 30);
+                
+                whoopEndDate.value = maxDate.toISOString().split('T')[0];
+                whoopStartDate.value = minDate.toISOString().split('T')[0];
+                
+                // Set min/max on date inputs
+                const allMinDate = new Date(Math.min(...dates));
+                whoopStartDate.min = allMinDate.toISOString().split('T')[0];
+                whoopStartDate.max = maxDate.toISOString().split('T')[0];
+                whoopEndDate.min = allMinDate.toISOString().split('T')[0];
+                whoopEndDate.max = maxDate.toISOString().split('T')[0];
+                
+                updateWhoopDateFilter();
+              }
+            }
+          }
+          
+          whoopStatus.innerHTML = `<i class="fa-solid fa-check-circle"></i> Loaded ${whoopData.cycles.length} recovery cycles`;
+        } catch (err) {
+          whoopStatus.innerHTML = `<i class="fa-solid fa-exclamation-triangle"></i> Error: ${err.message}`;
+          whoopData = null;
+          if (whoopDateRange) whoopDateRange.style.display = "none";
+        }
+      });
+    }
+
+    if (clearWhoopBtn) {
+      clearWhoopBtn.addEventListener("click", () => {
+        whoopFileInput.value = "";
+        whoopFileName.textContent = "Upload WHOOP CSV";
+        whoopFileName.parentElement.classList.remove("has-file");
+        clearWhoopBtn.style.display = "none";
+        whoopStatus.textContent = "Upload your WHOOP data export to enhance recovery & strain scoring";
+        whoopData = null;
+        if (whoopDateRange) whoopDateRange.style.display = "none";
+      });
+    }
+
+    // Date range filter handlers
+    if (whoopStartDate) {
+      whoopStartDate.addEventListener("change", updateWhoopDateFilter);
+    }
+    if (whoopEndDate) {
+      whoopEndDate.addEventListener("change", updateWhoopDateFilter);
+    }
+
+    function updateWhoopDateFilter() {
+      if (!whoopData || !whoopStartDate || !whoopEndDate) return;
+      
+      const startDate = whoopStartDate.value ? new Date(whoopStartDate.value) : null;
+      const endDate = whoopEndDate.value ? new Date(whoopEndDate.value) : null;
+      
+      const allCycles = whoopData.allCycles || whoopData.cycles;
+      let filteredCycles = allCycles;
+      
+      if (startDate || endDate) {
+        filteredCycles = allCycles.filter(cycle => {
+          const cycleDate = new Date(cycle.date);
+          if (isNaN(cycleDate)) return false;
+          
+          if (startDate && cycleDate < startDate) return false;
+          if (endDate) {
+            const endOfDay = new Date(endDate);
+            endOfDay.setHours(23, 59, 59, 999);
+            if (cycleDate > endOfDay) return false;
+          }
+          return true;
+        });
+      }
+      
+      // Store all cycles if not already stored
+      if (!whoopData.allCycles) {
+        whoopData.allCycles = [...whoopData.cycles];
+      }
+      
+      // Update with filtered data
+      whoopData.cycles = filteredCycles;
+      whoopData.avgRecovery = filteredCycles.reduce((sum, c) => sum + c.recovery, 0) / filteredCycles.length;
+      whoopData.avgHRV = filteredCycles.reduce((sum, c) => sum + c.hrv, 0) / filteredCycles.length;
+      whoopData.avgRestingHR = filteredCycles.reduce((sum, c) => sum + c.restingHR, 0) / filteredCycles.length;
+      whoopData.avgStrain = filteredCycles.reduce((sum, c) => sum + c.strain, 0) / filteredCycles.length;
+      whoopData.avgSleepPerf = filteredCycles.reduce((sum, c) => sum + c.sleepPerf, 0) / filteredCycles.length;
+      whoopData.avgSleepHours = filteredCycles.reduce((sum, c) => sum + c.sleepHours, 0) / filteredCycles.length;
+      
+      if (whoopDateInfo) {
+        whoopDateInfo.textContent = `Using ${filteredCycles.length} of ${allCycles.length} cycles`;
+      }
+    }
+
+    function parseWhoopCSV(csvText) {
+      const lines = csvText.trim().split("\n");
+      if (lines.length < 2) throw new Error("CSV file is empty or invalid");
+
+      const headers = lines[0].split(",").map(h => h.trim());
+      const cycles = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(",");
+        if (values.length !== headers.length) continue;
+
+        const row = {};
+        headers.forEach((header, idx) => {
+          row[header] = values[idx].trim();
+        });
+
+        // Parse date - check for common WHOOP date column names
+        let dateStr = row["Cycle start time"] || row["Cycle start"] || row["Date"] || "";
+        let cycleDate = null;
+        
+        if (dateStr) {
+          // Handle different date formats
+          cycleDate = new Date(dateStr);
+          if (isNaN(cycleDate)) {
+            // Try parsing common formats
+            const parts = dateStr.split(/[\/\-\s]/);
+            if (parts.length >= 3) {
+              cycleDate = new Date(parts[2], parts[0] - 1, parts[1]);
+            }
+          }
+        }
+
+        cycles.push({
+          date: cycleDate && !isNaN(cycleDate) ? cycleDate.toISOString().split('T')[0] : dateStr,
+          recovery: parseFloat(row["Recovery score"]) || 0,
+          hrv: parseFloat(row["HRV"]) || 0,
+          restingHR: parseFloat(row["Resting heart rate"]) || 0,
+          strain: parseFloat(row["Day Strain"]) || 0,
+          sleepPerf: parseFloat(row["Sleep performance %"]) || 0,
+          sleepHours: parseFloat(row["Asleep duration (minutes)"]) / 60 || 0,
+          remHours: parseFloat(row["REM duration (minutes)"]) / 60 || 0,
+          deepSleep: parseFloat(row["Deep (SWS) duration (minutes)"]) / 60 || 0,
+        });
+      }
+
+      return {
+        cycles,
+        avgRecovery: cycles.reduce((sum, c) => sum + c.recovery, 0) / cycles.length,
+        avgHRV: cycles.reduce((sum, c) => sum + c.hrv, 0) / cycles.length,
+        avgRestingHR: cycles.reduce((sum, c) => sum + c.restingHR, 0) / cycles.length,
+        avgStrain: cycles.reduce((sum, c) => sum + c.strain, 0) / cycles.length,
+        avgSleepPerf: cycles.reduce((sum, c) => sum + c.sleepPerf, 0) / cycles.length,
+        avgSleepHours: cycles.reduce((sum, c) => sum + c.sleepHours, 0) / cycles.length,
+      };
+    }
+
+    function syncContextButtons() {
+      if (clearContextBtn && promptInput) {
+        const hasContent = Boolean(promptInput.value.trim());
+        clearContextBtn.disabled = !hasContent;
+      }
+      if (stopResponseBtn) {
+        const hasActive = isStreaming || currentAbortController !== null;
+        stopResponseBtn.disabled = !hasActive;
+      }
+    }
+
+    if (promptInput) {
+      promptInput.addEventListener("input", () => {
+        syncContextButtons();
+      });
+      promptInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          if (askBtnEl && !askBtnEl.disabled) {
+            askBtnEl.click();
+          }
+        }
+      });
+    }
+
+    if (insertContextBtn && promptInput) {
+      insertContextBtn.addEventListener("click", () => {
+        if (!lastAnalyticsText) return;
+        const currentText = promptInput.value.trim();
+        if (currentText) {
+          promptInput.value = lastAnalyticsText + "\n\n" + currentText;
+        } else {
+          promptInput.value = lastAnalyticsText;
+        }
+        promptInput.focus();
+        syncContextButtons();
+      });
+    }
+
+    if (clearContextBtn && promptInput) {
+      clearContextBtn.addEventListener("click", () => {
+        promptInput.value = "";
+        promptInput.focus();
+        syncContextButtons();
+      });
+    }
+
+    if (stopResponseBtn) {
+      stopResponseBtn.addEventListener("click", () => {
+        const respEl = document.getElementById("aiResponse");
+        const statusEl = document.getElementById("aiStatus");
+        if (currentAbortController) {
+          currentAbortController.abort();
+          currentAbortController = null;
+        }
+        if (respEl) {
+          // Find the last assistant message text node being streamed
+          const assistantTexts = respEl.querySelectorAll(".ff-chat-assistant-text");
+          const lastText = assistantTexts[assistantTexts.length - 1];
+          if (lastText && currentStreamingText) {
+            stopStreaming(lastText, currentStreamingText);
+          }
+          currentStreamingText = "";
+        }
+        if (statusEl) {
+          statusEl.innerHTML =
+            '<span class="ff-status-dot err"></span><span>Response stopped.</span>';
+        }
+        syncContextButtons();
+      });
+    }
+
+    if (resetAiBtn) {
+      resetAiBtn.addEventListener("click", () => {
+        const respEl = document.getElementById("aiResponse");
+        const statusEl = document.getElementById("aiStatus");
+        if (currentAbortController) {
+          currentAbortController.abort();
+          currentAbortController = null;
+        }
+        if (respEl) {
+          // Clear all chat messages
+          respEl.innerHTML = "";
+        }
+        if (promptInput) {
+          promptInput.value = "";
+        }
+        if (contextInput) {
+          contextInput.value = "";
+        }
+        syncContextButtons();
+        if (statusEl) {
+          statusEl.innerHTML =
+            '<span class="ff-status-dot"></span><span>Session reset. Ready when you are.</span>';
+        }
+      });
+    }
+
+    if (copyLastAiBtn) {
+      copyLastAiBtn.addEventListener("click", () => {
+        const respEl = document.getElementById("aiResponse");
+        if (!respEl) return;
+        const assistantTexts = respEl.querySelectorAll(".ff-chat-assistant-text");
+        const lastText = assistantTexts[assistantTexts.length - 1];
+        if (!lastText) return;
+        const text = (lastText.textContent || "").trim();
+        if (!text) return;
+
+        const onCopied = () => {
+          copyLastAiBtn.classList.add("copied");
+          setTimeout(() => copyLastAiBtn.classList.remove("copied"), 1200);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(onCopied).catch(() => {});
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            document.execCommand("copy");
+            onCopied();
+          } catch (e) {
+            console.error("Copy failed", e);
+          } finally {
+            document.body.removeChild(ta);
+          }
+        }
+      });
+    }
+
+    syncContextButtons();
+
+    const PYTHON_CODE = `
+import json
+
+def _safe_float(val, default=0.0):
+    try:
+        if val is None:
+            return default
+        if isinstance(val, (int, float)):
+            return float(val)
+        s = str(val).strip()
+        if s == "":
+            return default
+        return float(s)
+    except Exception:
+        return default
+
+def analyze_fitness(form_data, whoop_data=None):
+    # form_data is a JS object converted to Python dict
+    age = _safe_float(form_data.get("age"), 35)
+    bmi = _safe_float(form_data.get("bmi"), 27)
+    work_hours = _safe_float(form_data.get("work_hours"), 9)
+    commute_minutes = _safe_float(form_data.get("commute_minutes"), 60)
+    sitting_hours = _safe_float(form_data.get("sitting_hours"), 9)
+    weekly_workouts = _safe_float(form_data.get("weekly_workouts"), 2)
+    avg_sleep = _safe_float(form_data.get("avg_sleep"), 6.5)
+    stress_level = _safe_float(form_data.get("stress_level"), 3)
+    late_screen = _safe_float(form_data.get("late_screen"), 2)
+    free_blocks = _safe_float(form_data.get("free_blocks"), 2)
+
+    # WHOOP data integration
+    whoop_recovery_score = 0
+    has_whoop = False
+    avg_hrv = 0
+    avg_resting_hr = 70
+    avg_strain = 0
+    avg_sleep_perf = 0
+    
+    if whoop_data is not None:
+        has_whoop = True
+        avg_recovery = _safe_float(whoop_data.get("avgRecovery") if hasattr(whoop_data, 'get') else 0, 0)
+        avg_hrv = _safe_float(whoop_data.get("avgHRV") if hasattr(whoop_data, 'get') else 0, 0)
+        avg_resting_hr = _safe_float(whoop_data.get("avgRestingHR") if hasattr(whoop_data, 'get') else 70, 70)
+        avg_strain = _safe_float(whoop_data.get("avgStrain") if hasattr(whoop_data, 'get') else 0, 0)
+        avg_sleep_perf = _safe_float(whoop_data.get("avgSleepPerf") if hasattr(whoop_data, 'get') else 0, 0)
+        avg_sleep_hours = _safe_float(whoop_data.get("avgSleepHours") if hasattr(whoop_data, 'get') else 0, 0)
+        
+        if avg_sleep_hours > 0:
+            avg_sleep = avg_sleep_hours
+        
+        whoop_recovery_score = avg_recovery / 100.0
+
+    # ===== ML ENSEMBLE MODEL =====
+    # Normalize features to 0-1 scale for ML models (all bounded)
+    features = {
+        'age_norm': max(0.0, min(1.0, (age - 25) / 40.0)),  # 25-65 range
+        'bmi_norm': max(0.0, min(1.0, (bmi - 18) / 22.0)),  # 18-40 range
+        'work_load': max(0.0, min(1.0, (work_hours + commute_minutes / 60.0) / 14.0)),  # 0-14 hours
+        'sitting_norm': max(0.0, min(1.0, sitting_hours / 12.0)),
+        'activity_norm': max(0.0, min(1.0, weekly_workouts / 7.0)),
+        'sleep_norm': max(0.0, min(1.0, avg_sleep / 9.0)),
+        'stress_norm': max(0.0, min(1.0, stress_level / 5.0)),
+        'screen_norm': max(0.0, min(1.0, late_screen / 4.0)),
+        'free_time_norm': max(0.0, min(1.0, free_blocks / 6.0)),
+        'hrv_norm': max(0.0, min(1.0, avg_hrv / 100.0)) if has_whoop else 0.5,
+        'resting_hr_norm': max(0.0, min(1.0, 1 - (avg_resting_hr - 50) / 50.0)) if has_whoop else 0.5,
+        'whoop_recovery_norm': max(0.0, min(1.0, whoop_recovery_score)) if has_whoop else 0.5,
+        'strain_norm': max(0.0, min(1.0, avg_strain / 18.0)) if has_whoop else 0.5,
+    }
+    
+    # Model 1: Gradient Boosting-inspired (non-linear interactions)
+    gb_score = 0.0
+    # Time pressure penalty (bounded)
+    time_pressure = min(1.0, features['work_load'] + features['sitting_norm'] * 0.5)
+    time_factor = max(0.0, 1.0 - time_pressure ** 1.2)
+    gb_score += time_factor * 0.28
+
+    # Sleep-stress interaction (multiplicative)
+    sleep_quality = features['sleep_norm'] * (1.0 - features['stress_norm'] * 0.4)
+    gb_score += sleep_quality * 0.24
+
+    # Recovery compound score (sleep + WHOOP)
+    recovery_compound = (features['sleep_norm'] * 0.4 +
+              features['whoop_recovery_norm'] * 0.3 +
+              features['hrv_norm'] * 0.2 +
+              features['resting_hr_norm'] * 0.1)
+    gb_score += recovery_compound * 0.18
+
+    # Activity with proper bounds
+    activity_boost = features['activity_norm']
+    gb_score += activity_boost * 0.14
+
+    # Free time availability
+    gb_score += features['free_time_norm'] * 0.08
+
+    # Age & BMI moderation (small but real influence)
+    age_moderation = 1.0 - abs(features['age_norm'] - 0.5)  # mid-range age is easiest
+    bmi_moderation = max(0.0, 1.0 - max(0.0, features['bmi_norm'] - 0.45) * 1.2)  # high BMI penalized
+    gb_score += age_moderation * 0.05
+    gb_score += bmi_moderation * 0.03
+
+    # Clamp GB score into [0, 1]
+    gb_score = max(0.0, min(1.0, gb_score))
+    
+    # Model 2: Random Forest-inspired (decision tree rules)
+    rf_score = 0.5  # baseline
+    
+    # Tree 1: Sleep-dominated path
+    if features['sleep_norm'] > 0.75:
+        rf_score += 0.15
+        if features['stress_norm'] < 0.6:
+            rf_score += 0.1
+    elif features['sleep_norm'] < 0.5:
+        rf_score -= 0.2
+    
+    # Tree 2: Work-life balance path
+    if features['work_load'] < 0.6 and features['free_time_norm'] > 0.4:
+        rf_score += 0.15
+    elif features['work_load'] > 0.8:
+        rf_score -= 0.15
+        if features['stress_norm'] > 0.6:
+            rf_score -= 0.1
+    
+    # Tree 3: Recovery metrics path (WHOOP)
+    if has_whoop:
+        if features['whoop_recovery_norm'] > 0.67:
+            rf_score += 0.12
+        elif features['whoop_recovery_norm'] < 0.33:
+            rf_score -= 0.15
+        
+        if features['hrv_norm'] > 0.5 and features['resting_hr_norm'] > 0.5:
+            rf_score += 0.08
+    
+    # Tree 4: Activity consistency
+    if features['activity_norm'] > 0.4:
+      rf_score += 0.1
+      if features['sitting_norm'] < 0.6:
+        rf_score += 0.05
+
+    # Clamp RF score into [0, 1]
+    rf_score = max(0.0, min(1.0, rf_score))
+
+    # Model 3: Neural Network-inspired (weighted combinations)
+    # Hidden layer 1: Feature combinations
+    h1_time = features['work_load'] * 0.6 + features['sitting_norm'] * 0.4
+    h1_recovery = features['sleep_norm'] * 0.5 + features['whoop_recovery_norm'] * 0.5
+    h1_vitality = features['activity_norm'] * 0.6 + features['hrv_norm'] * 0.4
+    h1_balance = features['free_time_norm'] * 0.5 + (1 - features['stress_norm']) * 0.5
+    
+    # Hidden layer 2: Non-linear activations (sigmoid-like)
+    def sigmoid(x):
+        return 1 / (1 + 2.718281828 ** (-5 * (x - 0.5)))
+    
+    h2_workload_impact = sigmoid(1 - h1_time)
+    h2_recovery_impact = sigmoid(h1_recovery)
+    h2_energy_impact = sigmoid(h1_vitality)
+    h2_mental_impact = sigmoid(h1_balance)
+    
+    # Output layer
+    nn_score = (h2_workload_impact * 0.35 +
+          h2_recovery_impact * 0.30 +
+          h2_energy_impact * 0.20 +
+          h2_mental_impact * 0.15)
+
+    # Clamp NN score into [0, 1]
+    nn_score = max(0.0, min(1.0, nn_score))
+    
+    # ENSEMBLE: Weighted average of models (ensure bounded)
+    ensemble_score = (gb_score * 0.40 +  # GB for complex interactions
+             rf_score * 0.35 +   # RF for rule-based decisions
+             nn_score * 0.25)    # NN for smooth gradients
+
+    # Explicit BMI risk adjustment so extreme BMI changes the score clearly
+    # bmi_norm ~0.4 around 27, ~1.0 at very high BMI like 70
+    bmi_risk = max(0.0, features['bmi_norm'] - 0.45)
+    # Up to ~0.4 * 0.4 = 0.16 drop (~16 points) for very high BMI
+    ensemble_score -= bmi_risk * 0.4
+
+    # Normalize to 0-100 with proper bounds
+    score_norm = max(0.0, min(1.0, ensemble_score))
+    score = round(score_norm * 100)
+    
+    # ===== EXPLAINABILITY (SHAP-like feature importance) =====
+    # Calculate marginal contributions of each feature relative to baseline
+    base_score = 0.5  # baseline without any features
+    
+    feature_impacts = {
+      'Sleep Quality': ((features['sleep_norm'] - 0.72) * 30.0),  # 6.5/9 = 0.72 baseline
+      'Work Pressure': ((0.65 - features['work_load']) * 25.0),  # Higher work = negative
+      'Activity Level': ((features['activity_norm'] - 0.29) * 20.0),  # 2/7 = 0.29 baseline
+      'Stress Management': ((0.60 - features['stress_norm']) * 18.0),  # 3/5 = 0.60 baseline
+      'Free Time': ((features['free_time_norm'] - 0.33) * 15.0),  # 2/6 = 0.33 baseline
+      'Screen Habits': ((0.50 - features['screen_norm']) * 12.0),  # 2/4 = 0.50 baseline
+      'Sedentary Time': ((0.75 - features['sitting_norm']) * 15.0),  # 9/12 = 0.75 baseline
+      'Age Profile': ((0.5 - features['age_norm']) * 8.0),  # mid-range age is neutral
+      'BMI Profile': ((0.4 - features['bmi_norm']) * 10.0),  # closer to healthy range is better
+    }
+
+    if has_whoop:
+      feature_impacts['WHOOP Recovery'] = ((features['whoop_recovery_norm'] - 0.60) * 20.0)
+      feature_impacts['HRV'] = ((features['hrv_norm'] - 0.50) * 12.0)
+      feature_impacts['Resting HR'] = ((features['resting_hr_norm'] - 0.60) * 10.0)
+
+    # Sort by absolute impact
+    sorted_impacts = sorted(feature_impacts.items(), key=lambda x: abs(x[1]), reverse=True)
+
+    # Create explanation text
+    explainability = {
+      'top_positive': [],
+      'top_negative': [],
+      'feature_contributions': feature_impacts,
+      'model_breakdown': {
+        'gradient_boosting': round(gb_score * 100),
+        'random_forest': round(rf_score * 100),
+        'neural_network': round(nn_score * 100),
+        'ensemble_weight': 'GB:40%, RF:35%, NN:25%'
+      }
+    }
+
+    # Collect up to 5 positive and 5 negative factors
+    for feature, impact in sorted_impacts:
+      if impact > 0 and len(explainability['top_positive']) < 5:
+        explainability['top_positive'].append(f"{feature}: +{impact:.1f} points")
+      elif impact < 0 and len(explainability['top_negative']) < 5:
+        explainability['top_negative'].append(f"{feature}: {impact:.1f} points")
+      if len(explainability['top_positive']) >= 5 and len(explainability['top_negative']) >= 5:
+        break
+
+    # Time budget: how many minutes/day of realistic habit time
+    
+    # Time budget calculation
+    time_load = (work_hours + commute_minutes / 60.0 + sitting_hours / 3.0) / 24.0
+    base_budget = 35.0
+    budget = base_budget + (free_blocks * 5.0) - max(0.0, (time_load - 1.0)) * 30.0
+    budget = max(10.0, min(60.0, budget))
+
+    # Bands
+    if score < 35:
+        band = "Overloaded"
+        band_desc = "ML models indicate severe time pressure. Focus on energy protection, not performance."
+        band_tag = "overloaded"
+    elif score < 55:
+        band = "Tight but workable"
+        band_desc = "Ensemble prediction shows moderate stress. Room for 15–30 min structured micro-habits."
+        band_tag = "tight"
+    elif score < 75:
+        band = "Sustainable"
+        band_desc = "Models indicate balanced state. Can ramp intensity while protecting recovery."
+        band_tag = "sustainable"
+    else:
+        band = "Thriving"
+        band_desc = "ML ensemble shows optimal conditions for progressive overload and performance gains."
+        band_tag = "thriving"
+
+    # Sleep, sedentary & activity sub-scores
+    sleep_eff = max(0.0, min(1.0, (avg_sleep - 5.0) / 3.0))
+    sedentary = max(0.0, min(1.5, sitting_hours / 8.0))
+    sedentary_load = max(0.0, min(1.0, sedentary / 1.2))
+    activity_idx = max(0.0, min(1.2, weekly_workouts / 4.0))
+
+    # Bottlenecks
+    bottlenecks = []
+    
+    # WHOOP-specific bottlenecks
+    if has_whoop:
+        if whoop_data.get("avgRecovery", 0) < 33:
+            bottlenecks.append("WHOOP: Low recovery (red zone) – prioritize sleep quality and reduce training load.")
+        if avg_hrv < 30:
+            bottlenecks.append("WHOOP: Low HRV indicates high stress – consider meditation or lighter workouts.")
+        if avg_strain > 15:
+            bottlenecks.append("WHOOP: High daily strain – ensure adequate recovery between intense sessions.")
+        if avg_sleep_perf < 75:
+            bottlenecks.append("WHOOP: Sleep performance below 75% – optimize sleep environment and consistency.")
+    
+    # Standard bottlenecks
+    if avg_sleep < 7:
+        bottlenecks.append("Sleep debt – target +30 to +60 min earlier shutdown.")
+    if late_screen >= 2:
+        bottlenecks.append("High late-night screen exposure – blue light reduction before bed.")
+    if sitting_hours >= 8:
+        bottlenecks.append("Long sitting window – insert 3-minute mobility every 45–60 min.")
+    if weekly_workouts <= 2:
+        bottlenecks.append("Low structured movement – start with 2 × 20-min week-day blocks.")
+    if free_blocks <= 1:
+        bottlenecks.append("Almost zero controllable time blocks – must protect at least one 15-min slot.")
+    if not bottlenecks:
+        bottlenecks.append("No single severe bottleneck detected – focus on consistency and progression.")
+
+    # Micro-habit schedule (dummy but logical)
+    plan = []
+
+    if free_blocks <= 1:
+        plan.append("During commute: 3 × 60-second calf raises + seated core breathing.")
+        plan.append("At desk: once every hour, 20 chair squats or wall push-ups (3 minutes).")
+        plan.append("Before bed: 5-minute mobility + phone out of bedroom.")
+    elif free_blocks <= 3:
+        plan.append("Morning (10–15 min): 5-min brisk walk + 10-min bodyweight circuit.")
+        plan.append("Mid-day (5–10 min): walking meeting or corridor steps, minimum 800–1,000 steps.")
+        plan.append("Evening (10–15 min): light strength + stretch or low-intensity walk.")
+    else:
+        plan.append("Morning (20 min): structured strength (push, pull, legs) + warm-up.")
+        plan.append("Mid-day (10 min): brisk walk + mobility break.")
+        plan.append("Evening (15–20 min): mix of conditioning (interval walk) + static stretching.")
+
+    # Dummy weekly pattern (for potential graphs later)
+    weekly_pattern = [round(score * (0.9 + i * 0.02), 1) for i in range(7)]
+
+    debug = {
+        "time_load": round(time_load, 3),
+        "sleep_eff": round(sleep_eff, 3),
+        "sedentary_load": round(sedentary_load, 3),
+        "activity_idx": round(activity_idx, 3),
+        "ensemble_score": round(ensemble_score, 3),
+        "gb_score": round(gb_score, 3),
+        "rf_score": round(rf_score, 3),
+        "nn_score": round(nn_score, 3),
+        "weekly_pattern": weekly_pattern,
+        "inputs": form_data,
+    }
+
+    result = {
+        "score": score,
+        "score_norm": round(score_norm, 3),
+        "band": band,
+        "band_desc": band_desc,
+        "band_tag": band_tag,
+        "daily_budget": int(round(budget)),
+        "sleep_eff": round(sleep_eff * 100),
+        "sedentary_load": round(sedentary_load * 100),
+        "activity_idx": round(min(activity_idx, 1.0) * 100),
+        "bottlenecks": bottlenecks,
+        "plan": plan,
+        "explainability": explainability,
+        "debug": debug,
+    }
+    return json.dumps(result)
+`;
+
+    function stopStreaming(el, fullText) {
+      if (typingInterval) {
+        clearTimeout(typingInterval);
+        typingInterval = null;
+      }
+      if (el && fullText) {
+        // Complete to next sentence boundary instead of cutting mid-sentence
+        const currentText = el.textContent || "";
+        if (currentText.length < fullText.length) {
+          const remaining = fullText.slice(currentText.length);
+          const sentenceEnd = remaining.search(/[.!?]\s/);
+          if (sentenceEnd !== -1) {
+            // Complete to end of current sentence
+            el.textContent = currentText + remaining.slice(0, sentenceEnd + 1);
+          } else {
+            // No sentence boundary found, show full text
+            el.textContent = fullText;
+          }
+        }
+      }
+      if (el) {
+        el.classList.remove("typing");
+      }
+      isStreaming = false;
+      syncContextButtons();
+    }
+
+    function streamText(el, text) {
+      if (!el) return;
+      const fullText = text || "";
+      currentStreamingText = fullText;
+      stopStreaming(el, fullText);
+      el.textContent = "";
+      if (!fullText) {
+        return;
+      }
+
+      el.classList.add("typing");
+      isStreaming = true;
+      syncContextButtons();
+
+      let idx = 0;
+      const step = fullText.length > 600 ? 3 : 2;
+
+      const typeNext = () => {
+        idx = Math.min(fullText.length, idx + step);
+        el.textContent = fullText.slice(0, idx);
+        if (idx >= fullText.length) {
+          stopStreaming(el, fullText);
+          currentStreamingText = "";
+          // Apply light formatting (paragraphs, bullet lists) once complete
+          formatAssistantMessage(el);
+          return;
+        }
+        const currentChar = fullText[Math.max(0, idx - 1)];
+        let delay = 14 + Math.random() * 14;
+        if (currentChar === "." || currentChar === "!" || currentChar === "?") {
+          delay = 70;
+        } else if (currentChar === "," || currentChar === ";" || currentChar === ":") {
+          delay = 45;
+        }
+        typingInterval = setTimeout(typeNext, delay);
+      };
+
+      typingInterval = setTimeout(typeNext, 35);
+    }
+
+    function collapseFitAI() {
+      if (aiCard) {
+        aiCard.classList.add("hidden");
+      }
+      if (launcherBtn) {
+        launcherBtn.classList.add("show");
+      }
+    }
+
+    function expandFitAI() {
+      if (aiCard) {
+        aiCard.classList.remove("hidden");
+      }
+      if (launcherBtn) {
+        launcherBtn.classList.remove("show");
+      }
+    }
+
+    async function initPyodideAndCode() {
+      const statusEl = document.getElementById("pyodideStatus");
+      try {
+        statusEl.textContent = "Preparing your analysis…";
+        const pyodide = await loadPyodide();
+        await pyodide.runPythonAsync(PYTHON_CODE);
+        window._pyodide = pyodide;
+        statusEl.innerHTML =
+          '<span style="color:#4ade80;"><i class="fa-solid fa-circle-check me-1"></i>Analysis ready</span>';
+        document.getElementById("runAnalysisBtn").disabled = false;
+      } catch (e) {
+        console.error(e);
+        statusEl.innerHTML =
+          '<span style="color:#f87171;"><i class="fa-solid fa-triangle-exclamation me-1"></i>Analysis could not load</span>';
+      }
+    }
+
+    pyodideReadyPromise = initPyodideAndCode();
+
+    // ========= ANALYZER HANDLER =========
+    function getStressLabel(v) {
+      const x = Number(v);
+      if (x <= 1) return "Very low";
+      if (x === 2) return "Low";
+      if (x === 3) return "Moderate";
+      if (x === 4) return "High";
+      return "Very high";
+    }
+
+    document.getElementById("stress_level").addEventListener("input", (e) => {
+      document.getElementById("stressLabel").textContent = getStressLabel(
+        e.target.value
+      );
+    });
+
+    document
+      .getElementById("runAnalysisBtn")
+      .addEventListener("click", async () => {
+        const btn = document.getElementById("runAnalysisBtn");
+        const statusEl = document.getElementById("pyodideStatus");
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="fa-solid fa-circle-notch fa-spin me-1"></i> Running…';
+
+        const formData = {
+          age: document.getElementById("age").value,
+          bmi: document.getElementById("bmi").value,
+          work_hours: document.getElementById("work_hours").value,
+          commute_minutes: document.getElementById("commute_minutes").value,
+          sitting_hours: document.getElementById("sitting_hours").value,
+          weekly_workouts: document.getElementById("weekly_workouts").value,
+          avg_sleep: document.getElementById("avg_sleep").value,
+          stress_level: document.getElementById("stress_level").value,
+          late_screen: document.getElementById("late_screen").value,
+          free_blocks: document.getElementById("free_blocks").value,
+        };
+
+        console.log("Form data being analyzed:", formData);
+        console.log("WHOOP data:", whoopData);
+
+        let analyzerFn = null;
+        let pyFormData = null;
+        let pyWhoopData = null;
+        try {
+          await pyodideReadyPromise;
+          const pyodide = window._pyodide;
+          analyzerFn = pyodide.globals.get("analyze_fitness");
+          pyFormData = pyodide.toPy(formData);
+          
+          // Pass WHOOP data if available
+          let jsonRes;
+          if (whoopData) {
+            pyWhoopData = pyodide.toPy(whoopData);
+            jsonRes = analyzerFn(pyFormData, pyWhoopData);
+          } else {
+            jsonRes = analyzerFn(pyFormData);
+          }
+          
+          const res = JSON.parse(jsonRes);
+          console.log("Analysis result:", res);
+          updateUIWithResults(res);
+          statusEl.textContent =
+            "Analysis complete. You can tweak inputs & rerun.";
+          btn.innerHTML =
+            '<i class="fa-solid fa-rotate me-1"></i> Run again';
+        } catch (err) {
+          console.error("Analysis error:", err);
+          console.error("Error details:", err.message, err.stack);
+          statusEl.innerHTML =
+            '<span style="color:#f87171;"><i class="fa-solid fa-triangle-exclamation me-1"></i>Analysis error: ' + (err.message || 'Unknown error') + '</span>';
+          btn.innerHTML =
+            '<i class="fa-solid fa-rotate me-1"></i> Try again';
+        } finally {
+          btn.disabled = false;
+          if (pyFormData && typeof pyFormData.destroy === "function") {
+            pyFormData.destroy();
+          }
+          if (pyWhoopData && typeof pyWhoopData.destroy === "function") {
+            pyWhoopData.destroy();
+          }
+          if (analyzerFn && typeof analyzerFn.destroy === "function") {
+            analyzerFn.destroy();
+          }
+        }
+      });
+
+    function updateUIWithResults(res) {
+      // Score & band
+      document.getElementById("scoreNumber").textContent = res.score ?? "–";
+
+      let bandClass = "ff-chip-band";
+      if (res.band_tag === "overloaded") bandClass += " ff-chip-overloaded";
+      else if (res.band_tag === "tight") bandClass += " ff-chip-tight";
+      else if (res.band_tag === "sustainable")
+        bandClass += " ff-chip-sustainable";
+      else if (res.band_tag === "thriving") bandClass += " ff-chip-thriving";
+
+      document.getElementById("scoreBandText").innerHTML =
+        `<span class="${bandClass}">${res.band}</span> – ${res.band_desc}`;
+
+      document.getElementById(
+        "scoreBudgetText"
+      ).textContent = `${res.daily_budget} min / day realistic fitness budget`;
+
+      document.getElementById("pillSleep").textContent =
+        res.sleep_eff + "%";
+      document.getElementById("pillSedentary").textContent =
+        res.sedentary_load + "%";
+      document.getElementById("pillActivity").textContent =
+        res.activity_idx + "%";
+
+      // Bottlenecks
+      const bottleneckList = document.getElementById("bottleneckList");
+      bottleneckList.innerHTML = "";
+      (res.bottlenecks || []).forEach((b) => {
+        const li = document.createElement("li");
+        li.innerHTML =
+          '<i class="fa-solid fa-circle-exclamation"></i><span>' +
+          b +
+          "</span>";
+        bottleneckList.appendChild(li);
+      });
+
+      // ML Explainability
+      const explainability = res.explainability || {};
+      const mlSection = document.getElementById("mlExplainSection");
+      
+      if (explainability.top_positive || explainability.top_negative) {
+        mlSection.style.display = "block";
+        
+        // Top positive impacts
+        const topPositive = document.getElementById("topPositiveImpacts");
+        topPositive.innerHTML = "";
+        (explainability.top_positive || []).forEach(impact => {
+          const div = document.createElement("div");
+          div.className = "ff-impact-item ff-impact-positive";
+          div.innerHTML = `<i class="fa-solid fa-arrow-up"></i><span>${impact}</span>`;
+          topPositive.appendChild(div);
+        });
+        
+        // Top negative impacts
+        const topNegative = document.getElementById("topNegativeImpacts");
+        topNegative.innerHTML = "";
+        (explainability.top_negative || []).forEach(impact => {
+          const div = document.createElement("div");
+          div.className = "ff-impact-item ff-impact-negative";
+          div.innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>${impact}</span>`;
+          topNegative.appendChild(div);
+        });
+      }
+
+      // Plan
+      const habitPlanList = document.getElementById("habitPlanList");
+      habitPlanList.innerHTML = "";
+      (res.plan || []).forEach((p) => {
+        const li = document.createElement("li");
+        li.innerHTML =
+          '<i class="fa-solid fa-stopwatch"></i><span>' + p + "</span>";
+        habitPlanList.appendChild(li);
+      });
+
+      const debug = res.debug || {};
+      const inputs = debug.inputs || {};
+
+      // Quick wins
+      const quickWins = [];
+      if ((res.sleep_eff || 0) < 70) {
+        quickWins.push(
+          "Add a 45-minute wind-down twice this week to lift sleep efficiency."
+        );
+      } else {
+        quickWins.push(
+          "Keep your 30-minute phone-free wind-down to protect current sleep gains."
+        );
+      }
+
+      if ((res.sedentary_load || 0) > 60) {
+        quickWins.push(
+          "Drop in three 2-minute stand-and-flow breaks during the longest sitting block."
+        );
+      } else if (quickWins.length < 3) {
+        quickWins.push(
+          "Pair each meeting wrap-up with a 90-second posture reset to stay mobile."
+        );
+      }
+
+      if ((res.activity_idx || 0) < 55) {
+        quickWins.push(
+          "Stack a 12-minute brisk walk onto two workdays to raise movement volume."
+        );
+      } else if (quickWins.length < 4) {
+        quickWins.push(
+          "Add one progressive interval walk (10 minutes) this week to keep momentum."
+        );
+      }
+
+      const freeBlocksVal = Number(inputs.free_blocks ?? NaN);
+      if (!Number.isNaN(freeBlocksVal) && freeBlocksVal < 2) {
+        quickWins.push(
+          "Protect a 15-minute slot after lunch by blocking it on your calendar."
+        );
+      }
+
+      const lateScreenVal = Number(inputs.late_screen ?? NaN);
+      if (
+        !Number.isNaN(lateScreenVal) &&
+        lateScreenVal > 1.5 &&
+        quickWins.length < 4
+      ) {
+        quickWins.push(
+          "Shift screens off 45 minutes before bed and swap in light mobility."
+        );
+      }
+
+      let renderedQuickWins = quickWins.filter(Boolean);
+      if (!renderedQuickWins.length) {
+        renderedQuickWins = [
+          "You're balanced—clone this schedule for the next three workdays to lock in consistency.",
+        ];
+      }
+      renderedQuickWins = renderedQuickWins.slice(0, 4);
+
+      const quickWinList = document.getElementById("quickWinList");
+      if (quickWinList) {
+        quickWinList.innerHTML = "";
+        renderedQuickWins.forEach((tip) => {
+          const li = document.createElement("li");
+          li.innerHTML =
+            '<i class="fa-solid fa-bolt"></i><span>' + tip + "</span>";
+          quickWinList.appendChild(li);
+        });
+      }
+
+      // Momentum metrics
+      const weeklyPattern = Array.isArray(debug.weekly_pattern)
+        ? debug.weekly_pattern
+        : [];
+      let weeklyTrendValue = "–";
+      if (weeklyPattern.length >= 2) {
+        const diff = weeklyPattern[weeklyPattern.length - 1] - weeklyPattern[0];
+        if (Math.abs(diff) < 1) {
+          weeklyTrendValue = `Stable (${weeklyPattern[0].toFixed(0)} → ${weeklyPattern[
+            weeklyPattern.length - 1
+          ].toFixed(0)})`;
+        } else if (diff > 0) {
+          weeklyTrendValue = `Improving (+${diff.toFixed(1)} pts)`;
+        } else {
+          weeklyTrendValue = `Sliding (${diff.toFixed(1)} pts)`;
+        }
+      } else if (weeklyPattern.length === 1) {
+        weeklyTrendValue = `Holding @ ${weeklyPattern[0].toFixed(0)}`;
+      }
+
+      const recoveryVal =
+        typeof debug.ensemble_score === "number" ? (debug.ensemble_score - 0.5) : null;
+      let recoverySummary = "–";
+      if (recoveryVal !== null) {
+        if (recoveryVal >= 0.3) {
+          recoverySummary = `High capacity (+${recoveryVal.toFixed(2)})`;
+        } else if (recoveryVal >= 0.1) {
+          recoverySummary = `Balanced (+${recoveryVal.toFixed(2)})`;
+        } else if (recoveryVal >= -0.1) {
+          recoverySummary = `${recoveryVal >= 0 ? "+" : ""}${recoveryVal.toFixed(
+            2
+          )} • add recovery time`;
+        } else {
+          recoverySummary = `${recoveryVal.toFixed(2)} • priority rest`;
+        }
+      }
+
+      let focusSummary = "–";
+      if (!Number.isNaN(freeBlocksVal)) {
+        if (freeBlocksVal >= 3) {
+          focusSummary = `${freeBlocksVal} slots ready`;
+        } else if (freeBlocksVal >= 1) {
+          focusSummary = `${freeBlocksVal} slot • guard it`;
+        } else {
+          focusSummary = "Create one micro-slot";
+        }
+      }
+
+      let screenSummary = "–";
+      if (!Number.isNaN(lateScreenVal)) {
+        if (lateScreenVal <= 1) {
+          screenSummary = "Low (≤1 hr)";
+        } else if (lateScreenVal <= 2.5) {
+          screenSummary = `${lateScreenVal.toFixed(
+            1
+          )} hrs • trim 30–45 min`;
+        } else {
+          screenSummary = `${lateScreenVal.toFixed(
+            1
+          )} hrs • cut 1 hr pre-bed`;
+        }
+      }
+
+      const weeklyTrendEl = document.getElementById("weeklyTrendText");
+      if (weeklyTrendEl) {
+        weeklyTrendEl.textContent = weeklyTrendValue;
+      }
+
+      const weeklyTrendPill = document.getElementById("weeklyTrendPill");
+      if (weeklyTrendPill) {
+        weeklyTrendPill.textContent = weeklyTrendValue;
+      }
+
+      const recoveryScoreEl = document.getElementById("recoveryScoreText");
+      if (recoveryScoreEl) {
+        recoveryScoreEl.textContent = recoverySummary;
+      }
+
+      const recoveryScorePill = document.getElementById("recoveryScorePill");
+      if (recoveryScorePill) {
+        recoveryScorePill.textContent = recoverySummary;
+      }
+
+      const focusBlocksEl = document.getElementById("focusBlocksText");
+      if (focusBlocksEl) {
+        focusBlocksEl.textContent = focusSummary;
+      }
+
+      const focusBlocksPill = document.getElementById("focusBlocksPill");
+      if (focusBlocksPill) {
+        focusBlocksPill.textContent = focusSummary;
+      }
+
+      const screenHabitEl = document.getElementById("screenHabitText");
+      if (screenHabitEl) {
+        screenHabitEl.textContent = screenSummary;
+      }
+
+      // Hero metrics
+      document.getElementById("heroTimeBudget").textContent =
+        res.daily_budget + " min";
+      document.getElementById("heroIndex").textContent = res.score;
+      document.getElementById("heroIndexLabel").textContent = res.band;
+      document.getElementById("heroHabits").textContent = (res.plan || []).length;
+
+      // Band badge
+      const bandBadge = document.getElementById("bandBadge");
+      bandBadge.innerHTML =
+        '<i class="fa-solid fa-hourglass-half me-1"></i>' + res.band;
+
+      // Prepare analytics context text for FitAI
+      const bottleneckSummary = (res.bottlenecks || []).length
+        ? (res.bottlenecks || []).join("; ")
+        : "No severe bottlenecks detected";
+      const planSummary = (res.plan || []).length
+        ? (res.plan || []).join(" | ")
+        : "No plan generated";
+
+      const contextPieces = [
+        `Time-Crunch Fitness Score: ${res.score}/100 (${res.band}).`,
+        `Daily realistic time budget: ${res.daily_budget} minutes.`,
+        `Sleep efficiency: ${res.sleep_eff}%.`,
+        `Sedentary load: ${res.sedentary_load}%.`,
+        `Activity index: ${res.activity_idx}%.`,
+        `Key bottlenecks: ${bottleneckSummary}.`,
+        `Micro-habit plan: ${planSummary}.`,
+        `Weekly trend: ${weeklyTrendValue}.`,
+        `Recovery balance: ${recoverySummary}.`,
+        `Focus blocks: ${focusSummary}.`,
+        `Screen wind-down: ${screenSummary}.`,
+      ];
+
+      if (renderedQuickWins.length) {
+        contextPieces.push(`Quick wins: ${renderedQuickWins.join(" | ")}.`);
+      }
+
+      lastAnalyticsText = contextPieces.join(" ");
+      if (insertContextBtn) {
+        const hasContext = Boolean(lastAnalyticsText);
+        insertContextBtn.disabled = !hasContext;
+        insertContextBtn.classList.toggle("ready", hasContext);
+      }
+      
+      // Enable WhatsApp share button
+      const shareBtn = document.getElementById("shareWhatsappBtn");
+      if (shareBtn) {
+        shareBtn.disabled = false;
+      }
+      
+      syncContextButtons();
+    }
+
+    function formatAssistantMessage(el) {
+      if (!el) return;
+      const raw = (el.textContent || "").trim();
+      if (!raw) return;
+
+      const escapeHtml = (s) =>
+        s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+
+      const blocks = raw
+        .split(/\n{2,}/)
+        .map((b) => b.trim())
+        .filter(Boolean);
+
+      const parts = [];
+
+      blocks.forEach((block) => {
+        const lines = block
+          .split(/\n/)
+          .map((l) => l.trim())
+          .filter(Boolean);
+        if (!lines.length) return;
+
+        const isBulletBlock = lines.every((l) =>
+          /^[-*•]\s+/.test(l) || /^\d+\.\s+/.test(l)
+        );
+
+        if (isBulletBlock) {
+          const items = lines
+            .map((l) => l.replace(/^([-*•]|\d+\.)\s+/, ""))
+            .map((txt) => `<li>${escapeHtml(txt)}</li>`)
+            .join("");
+          parts.push(`<ul class="ff-ai-list">${items}</ul>`);
+        } else {
+          const para = lines
+            .map((l) => escapeHtml(l))
+            .join("<br>");
+          parts.push(`<p>${para}</p>`);
+        }
+      });
+
+      el.innerHTML = parts.join("");
+    }
+
+    // WhatsApp Share Handler
+    const shareWhatsappBtn = document.getElementById("shareWhatsappBtn");
+    if (shareWhatsappBtn) {
+      shareWhatsappBtn.addEventListener("click", () => {
+        if (!lastAnalyticsText) {
+          alert("No analysis data available. Run the analyzer first.");
+          return;
+        }
+
+        // Create formatted message for coach
+        const message = `🏋️ *FitFirst Analysis Report*\n\n${lastAnalyticsText}\n\n_Generated by FitFirst Time-Crunch Fitness Analyzer_`;
+        
+        // Encode for WhatsApp URL
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+        
+        // Open WhatsApp
+        window.open(whatsappUrl, '_blank');
+      });
+    }
+
+    if (collapseBtn) {
+      collapseBtn.addEventListener("click", () => {
+        collapseFitAI();
+      });
+    }
+
+    if (launcherBtn) {
+      launcherBtn.addEventListener("click", () => {
+        expandFitAI();
+        if (promptInput) {
+          promptInput.focus();
+        }
+      });
+    }
+
+    // ========= FITAI COACH (Secure API) =========
+    async function initOpenAIStatus() {
+      const statusEl = document.getElementById("aiStatus");
+      if (!askBtnEl || !statusEl) {
+        return;
+      }
+      if (!OPENAI_KEY_ENCRYPTED) {
+        statusEl.innerHTML =
+          '<span class="ff-status-dot err"></span><span>Secure setup incomplete. Add your access code to continue.</span>';
+        askBtnEl.disabled = true;
+        return;
+      }
+      statusEl.innerHTML =
+        '<span class="ff-status-dot"></span><span>Secure channel ready.</span>';
+      askBtnEl.disabled = false;
+    }
+
+    initOpenAIStatus();
+    if (askBtnEl) {
+      askBtnEl.addEventListener("click", async () => {
+        const respEl = document.getElementById("aiResponse");
+        const statusEl = document.getElementById("aiStatus");
+        const btn = askBtnEl;
+        if (!respEl || !statusEl) {
+          return;
+        }
+        const userPrompt = (promptInput ? promptInput.value : "").trim();
+
+        if (!promptInput) {
+          respEl.textContent = "Prompt input missing in DOM.";
+          return;
+        }
+
+        if (!userPrompt) {
+          respEl.textContent = "Please type a question or scenario for FitAI.";
+          return;
+        }
+
+        // Clear input and show user message in chat
+        const userMessage = userPrompt;
+        promptInput.value = "";
+
+        // Add user message to response area
+        const userMsgEl = document.createElement("div");
+        userMsgEl.className = "ff-chat-user-msg";
+        userMsgEl.textContent = userMessage;
+        respEl.appendChild(userMsgEl);
+
+        // Create assistant message container with inner text and copy button
+        const assistantMsgEl = document.createElement("div");
+        assistantMsgEl.className = "ff-chat-assistant-msg";
+
+        const assistantTextEl = document.createElement("div");
+        assistantTextEl.className = "ff-chat-assistant-text";
+        assistantMsgEl.appendChild(assistantTextEl);
+
+        const copyBtn = document.createElement("button");
+        copyBtn.type = "button";
+        copyBtn.className = "ff-chat-copy-btn";
+        copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+        copyBtn.title = "Copy response";
+        copyBtn.addEventListener("click", () => {
+          const text = assistantTextEl.textContent || "";
+          if (!text) return;
+          const onCopied = () => {
+            copyBtn.classList.add("copied");
+            setTimeout(() => copyBtn.classList.remove("copied"), 1200);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(onCopied).catch(() => {});
+          } else {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              document.execCommand("copy");
+              onCopied();
+            } catch (e) {
+              console.error("Copy failed", e);
+            } finally {
+              document.body.removeChild(ta);
+            }
+          }
+        });
+        assistantMsgEl.appendChild(copyBtn);
+
+        respEl.appendChild(assistantMsgEl);
+
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Thinking…</span>';
+        statusEl.innerHTML =
+          '<span class="ff-status-dot"></span><span>Connecting to FitAI…</span>';
+        assistantTextEl.classList.add("typing");
+
+        if (currentAbortController) {
+          currentAbortController.abort();
+        }
+        currentAbortController = new AbortController();
+        syncContextButtons();
+
+        try {
+          const apiKey = await decryptOpenAIKey();
+          const messages = [
+            {
+              role: "system",
+              content:
+                "You are a fitness coach specialized in time-crunched working professionals in India. " +
+                "You must design ultra-practical plans that fit into 3–20 minute blocks, focusing on energy, blood sugar, and long-term sustainability. " +
+                "Be specific, numeric when useful, and avoid extremes. Assume user has limited equipment and may work hybrid/office jobs.",
+            },
+          ];
+
+          if (lastAnalyticsText) {
+            messages.push({
+              role: "system",
+              content: "Fitness analytics context: " + lastAnalyticsText,
+            });
+          }
+
+          messages.push({
+            role: "user",
+            content: userMessage,
+          });
+
+          const res = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + apiKey,
+            },
+            body: JSON.stringify({
+              model: "gpt-4.1",
+              messages,
+              temperature: 0.4,
+              max_tokens: 500,
+            }),
+            signal: currentAbortController.signal,
+          });
+
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error("FitAI service error: " + text);
+          }
+
+          const data = await res.json();
+          const answer = data.choices?.[0]?.message?.content || "(No response)";
+          streamText(assistantTextEl, answer);
+          statusEl.innerHTML =
+            '<span class="ff-status-dot ok"></span><span>Response received from FitAI.</span>';
+        } catch (err) {
+          console.error(err);
+          stopStreaming(assistantTextEl, currentStreamingText);
+          currentStreamingText = "";
+          if (err.name === "AbortError") {
+            assistantTextEl.textContent = "Response stopped.";
+            statusEl.innerHTML =
+              '<span class="ff-status-dot err"></span><span>Response stopped.</span>';
+          } else {
+            assistantTextEl.textContent =
+              "We couldn't reach FitAI. Please verify your setup and try again.";
+            statusEl.innerHTML =
+              '<span class="ff-status-dot err"></span><span>FitAI connection error – check your setup.</span>';
+          }
+        } finally {
+          if (currentAbortController) {
+            currentAbortController = null;
+          }
+          btn.disabled = false;
+          btn.innerHTML =
+            '<i class="fa-solid fa-paper-plane"></i><span>Send</span>';
+          syncContextButtons();
+        }
+      });
+    }
+
+    collapseFitAI();
+
+    // =========================
+    // Tabs + Shop (Tab 2)
+    // =========================
+    const SHOP_PRODUCTS = [
+      {
+        id: "p1",
+        name: "Whey Protein Isolate – Chocolate",
+        category: "Supplements",
+        tag: "Best Seller",
+        tagStyle: "best",
+        ratingCount: 342,
+        price: 59.99,
+        compareAt: 79.99,
+        imageUrl: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=900&q=80",
+      },
+      {
+        id: "p2",
+        name: "Adjustable Dumbbells – 5–50 lb",
+        category: "Equipment",
+        tag: "Premium",
+        tagStyle: "premium",
+        ratingCount: 187,
+        price: 299.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?w=900&q=80",
+      },
+      {
+        id: "p3",
+        name: "Performance Compression Shorts",
+        category: "Apparel",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 98,
+        price: 44.99,
+        compareAt: 54.99,
+        imageUrl: "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=900&q=80",
+      },
+      {
+        id: "p4",
+        name: "Smart Fitness Tracker",
+        category: "Accessories",
+        tag: "New",
+        tagStyle: "new",
+        ratingCount: 256,
+        price: 149.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=900&q=80",
+      },
+      {
+        id: "p5",
+        name: "Pre‑Workout Energy Blend",
+        category: "Supplements",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 421,
+        price: 39.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=900&q=80",
+      },
+      {
+        id: "p6",
+        name: "Resistance Bands Set – Heavy Duty",
+        category: "Equipment",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 312,
+        price: 34.99,
+        compareAt: 44.99,
+        imageUrl: "https://images.unsplash.com/photo-1598632640487-6ea4a4e8b963?w=900&q=80",
+      },
+      {
+        id: "p7",
+        name: "Breathable Training Tank",
+        category: "Apparel",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 167,
+        price: 29.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=900&q=80",
+      },
+      {
+        id: "p8",
+        name: "Gym Duffle Bag – Large Capacity",
+        category: "Accessories",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 89,
+        price: 79.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=900&q=80",
+      },
+
+      // Fill to 24 products (kept intentionally simple + consistent)
+      {
+        id: "p9",
+        name: "Creatine Monohydrate – Unflavored",
+        category: "Supplements",
+        tag: "Premium",
+        tagStyle: "premium",
+        ratingCount: 503,
+        price: 24.99,
+        compareAt: 29.99,
+        imageUrl: "https://images.unsplash.com/photo-1621592482749-9e0c9423a8a1?w=900&q=80",
+      },
+      {
+        id: "p10",
+        name: "Electrolyte Hydration Mix",
+        category: "Supplements",
+        tag: "New",
+        tagStyle: "new",
+        ratingCount: 214,
+        price: 19.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1556228578-08d3a4b8aee1?w=900&q=80",
+      },
+      {
+        id: "p11",
+        name: "Omega‑3 Softgels",
+        category: "Supplements",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 141,
+        price: 17.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1615671524827-c1fe3973b648?w=900&q=80",
+      },
+      {
+        id: "p12",
+        name: "Plant Protein – Vanilla",
+        category: "Supplements",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 94,
+        price: 49.99,
+        compareAt: 59.99,
+        imageUrl: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=900&q=80",
+      },
+      {
+        id: "p13",
+        name: "Kettlebell – 16 kg",
+        category: "Equipment",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 132,
+        price: 59.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1599058917765-0a16ccfe9b20?w=900&q=80",
+      },
+      {
+        id: "p14",
+        name: "Yoga Mat – Extra Grip",
+        category: "Equipment",
+        tag: "Best Seller",
+        tagStyle: "best",
+        ratingCount: 688,
+        price: 34.99,
+        compareAt: 44.99,
+        imageUrl: "https://images.unsplash.com/photo-1599447292180-45f1f8a52d75?w=900&q=80",
+      },
+      {
+        id: "p15",
+        name: "Pull‑Up Bar – Doorframe",
+        category: "Equipment",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 201,
+        price: 39.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=900&q=80",
+      },
+      {
+        id: "p16",
+        name: "Foam Roller – High Density",
+        category: "Equipment",
+        tag: "Premium",
+        tagStyle: "premium",
+        ratingCount: 308,
+        price: 24.99,
+        compareAt: 29.99,
+        imageUrl: "https://images.unsplash.com/photo-1594381898411-846e7d193883?w=900&q=80",
+      },
+      {
+        id: "p17",
+        name: "Sweat‑Wicking Training Tee",
+        category: "Apparel",
+        tag: "New",
+        tagStyle: "new",
+        ratingCount: 77,
+        price: 24.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1526401485004-2fda9f6a1a53?w=900&q=80",
+      },
+      {
+        id: "p18",
+        name: "Lightweight Running Cap",
+        category: "Accessories",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 54,
+        price: 18.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1526481280695-3c687fd643ed?w=900&q=80",
+      },
+      {
+        id: "p19",
+        name: "Stainless Steel Shaker Bottle",
+        category: "Accessories",
+        tag: "Best Seller",
+        tagStyle: "best",
+        ratingCount: 902,
+        price: 24.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1615485737651-5806d10492fd?w=900&q=80",
+      },
+      {
+        id: "p20",
+        name: "Skipping Rope – Speed Cable",
+        category: "Accessories",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 223,
+        price: 14.99,
+        compareAt: 19.99,
+        imageUrl: "https://images.unsplash.com/photo-1595078475328-1ab05d0a0c01?w=900&q=80",
+      },
+      {
+        id: "p21",
+        name: "Compression Socks – Pair",
+        category: "Apparel",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 111,
+        price: 12.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=900&q=80",
+      },
+      {
+        id: "p22",
+        name: "Training Hoodie – Midweight",
+        category: "Apparel",
+        tag: "Premium",
+        tagStyle: "premium",
+        ratingCount: 62,
+        price: 54.99,
+        compareAt: 64.99,
+        imageUrl: "https://images.unsplash.com/photo-1520975958221-6c9b11f6c7f2?w=900&q=80",
+      },
+      {
+        id: "p23",
+        name: "Gym Gloves – Grip Support",
+        category: "Accessories",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 138,
+        price: 19.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1583864697784-a0efc8379f70?w=900&q=80",
+      },
+      {
+        id: "p24",
+        name: "Magnesium Glycinate",
+        category: "Supplements",
+        tag: null,
+        tagStyle: null,
+        ratingCount: 173,
+        price: 21.99,
+        compareAt: null,
+        imageUrl: "https://images.unsplash.com/photo-1616671276441-2f2b2fb1c3f6?w=900&q=80",
+      },
+    ];
+
+    function formatMoney(amount) {
+      return "₹" + amount.toFixed(2);
+    }
+
+    function getShopCounts() {
+      const counts = {
+        "All Products": SHOP_PRODUCTS.length,
+        Supplements: 0,
+        Equipment: 0,
+        Apparel: 0,
+        Accessories: 0,
+      };
+      for (const p of SHOP_PRODUCTS) {
+        if (counts[p.category] !== undefined) counts[p.category] += 1;
+      }
+      return counts;
+    }
+
+    function initMainTabs() {
+      const tabButtons = Array.from(document.querySelectorAll(".ff-tab[data-ff-tab-target]"));
+      const panels = Array.from(document.querySelectorAll(".ff-tab-panel[data-ff-tab-panel]"));
+
+      function activate(tabKey, { scrollToHash = null } = {}) {
+        for (const btn of tabButtons) {
+          const isActive = btn.getAttribute("data-ff-tab-target") === tabKey;
+          btn.classList.toggle("active", isActive);
+          btn.setAttribute("aria-selected", isActive ? "true" : "false");
+        }
+
+        for (const panel of panels) {
+          const isActive = panel.getAttribute("data-ff-tab-panel") === tabKey;
+          panel.classList.toggle("active", isActive);
+        }
+
+        if (scrollToHash) {
+          const el = document.querySelector(scrollToHash);
+          if (el) {
+            setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+          }
+        }
+      }
+
+      tabButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const tabKey = btn.getAttribute("data-ff-tab-target");
+          const hash = tabKey === "shop" ? "#shop" : "#analyzer";
+          activate(tabKey);
+          history.replaceState(null, "", hash);
+        });
+      });
+
+      // Header links: ensure correct tab is active before scrolling
+      const headerLinks = Array.from(document.querySelectorAll(".ff-nav-links a[href^='#']"));
+      headerLinks.forEach((a) => {
+        a.addEventListener("click", (e) => {
+          const href = a.getAttribute("href") || "";
+          if (!href.startsWith("#")) return;
+          e.preventDefault();
+
+          if (href === "#shop") {
+            activate("shop", { scrollToHash: "#shop" });
+            history.replaceState(null, "", "#shop");
+          } else {
+            activate("analyzer", { scrollToHash: href });
+            history.replaceState(null, "", href);
+          }
+        });
+      });
+
+      // Deep link support
+      if (location.hash === "#shop") {
+        activate("shop");
+      } else {
+        activate("analyzer");
+      }
+    }
+
+    function initShop() {
+      const categoryBar = document.getElementById("shopCategoryBar");
+      const grid = document.getElementById("shopGrid");
+      const loadMoreBtn = document.getElementById("shopLoadMoreBtn");
+      const cartCountEl = document.getElementById("cartCount");
+      const cartTotalEl = document.getElementById("cartTotal");
+      const cartPanel = document.getElementById("cartPanel");
+      const cartToggleBtn = document.getElementById("cartToggleBtn");
+      const cartClearBtn = document.getElementById("cartClearBtn");
+      const cartCheckoutBtn = document.getElementById("cartCheckoutBtn");
+      if (!categoryBar || !grid || !loadMoreBtn) return;
+      if (!cartCountEl || !cartTotalEl || !cartPanel || !cartToggleBtn || !cartClearBtn || !cartCheckoutBtn) return;
+
+      const CART_STORAGE_KEY = "ff_cart_v1";
+
+      function loadCart() {
+        try {
+          const raw = localStorage.getItem(CART_STORAGE_KEY);
+          if (!raw) return {};
+          const parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== "object") return {};
+          return parsed;
+        } catch {
+          return {};
+        }
+      }
+
+      function saveCart(cart) {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      }
+
+      let cart = loadCart();
+      let cartOpen = false;
+
+      function getProductById(id) {
+        return SHOP_PRODUCTS.find((p) => p.id === id) || null;
+      }
+
+      function getCartItems() {
+        const items = [];
+        for (const [productId, qty] of Object.entries(cart)) {
+          const product = getProductById(productId);
+          if (!product) continue;
+          const quantity = Number(qty) || 0;
+          if (quantity <= 0) continue;
+          items.push({ product, quantity });
+        }
+        return items;
+      }
+
+      function getCartCount() {
+        return getCartItems().reduce((sum, i) => sum + i.quantity, 0);
+      }
+
+      function getCartTotal() {
+        return getCartItems().reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+      }
+
+      function setQty(productId, quantity) {
+        const q = Math.max(0, Math.floor(quantity));
+        if (q === 0) {
+          delete cart[productId];
+        } else {
+          cart[productId] = q;
+        }
+        saveCart(cart);
+        renderCart();
+      }
+
+      function addToCart(productId) {
+        const current = Number(cart[productId] || 0);
+        setQty(productId, current + 1);
+        if (!cartOpen) {
+          cartOpen = true;
+          renderCart();
+        }
+      }
+
+      function clearCart() {
+        cart = {};
+        saveCart(cart);
+        renderCart();
+      }
+
+      function renderCart() {
+        const items = getCartItems();
+        const count = items.reduce((sum, i) => sum + i.quantity, 0);
+        const total = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+
+        cartCountEl.textContent = String(count);
+        cartTotalEl.textContent = formatMoney(total);
+
+        cartPanel.style.display = cartOpen && items.length ? "block" : "none";
+        cartToggleBtn.textContent = cartOpen ? "Hide Cart" : "View Cart";
+
+        if (!items.length) {
+          cartPanel.innerHTML = "";
+          return;
+        }
+
+        cartPanel.innerHTML = items
+          .map(({ product, quantity }) => {
+            const lineTotal = product.price * quantity;
+            return `
+              <div class="ff-cart-row">
+                <div>
+                  <div class="ff-cart-item-name">${product.name}</div>
+                  <div class="ff-cart-item-sub">${product.category} • ${formatMoney(product.price)} each • Line: <strong>${formatMoney(lineTotal)}</strong></div>
+                </div>
+                <div class="ff-qty" aria-label="Quantity">
+                  <button type="button" data-ff-qty="dec" data-ff-id="${product.id}" aria-label="Decrease">−</button>
+                  <span>${quantity}</span>
+                  <button type="button" data-ff-qty="inc" data-ff-id="${product.id}" aria-label="Increase">+</button>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      const counts = getShopCounts();
+      const categories = [
+        { key: "All Products", label: "All Products" },
+        { key: "Supplements", label: "Supplements" },
+        { key: "Equipment", label: "Equipment" },
+        { key: "Apparel", label: "Apparel" },
+        { key: "Accessories", label: "Accessories" },
+      ];
+
+      let activeCategory = "All Products";
+      let visibleCount = 8;
+
+      function productMatches(p) {
+        if (activeCategory === "All Products") return true;
+        return p.category === activeCategory;
+      }
+
+      function renderCategoryBar() {
+        categoryBar.innerHTML = "";
+        categories.forEach((c) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "ff-shop-cat" + (activeCategory === c.key ? " active" : "");
+          btn.setAttribute("data-ff-category", c.key);
+          btn.innerHTML =
+            `<div class="ff-shop-cat-title">${c.label}</div>` +
+            `<div class="ff-shop-cat-sub">${counts[c.key]} products</div>`;
+          btn.addEventListener("click", () => {
+            activeCategory = c.key;
+            visibleCount = 8;
+            renderCategoryBar();
+            renderGrid();
+          });
+          categoryBar.appendChild(btn);
+        });
+      }
+
+      function renderGrid() {
+        const filtered = SHOP_PRODUCTS.filter(productMatches);
+        const slice = filtered.slice(0, visibleCount);
+
+        grid.innerHTML = "";
+        slice.forEach((p) => {
+          const card = document.createElement("article");
+          card.className = "ff-product-card";
+          const tagHtml = p.tag
+            ? `<div class="ff-product-tag ${p.tagStyle || ""}">${p.tag}</div>`
+            : "";
+
+          const compareHtml = p.compareAt ? `<span class="ff-compare">${formatMoney(p.compareAt)}</span>` : "";
+          const stars = "★★★★★";
+
+          card.innerHTML = `
+            <div class="ff-product-img">
+              <img src="${p.imageUrl}" alt="${p.name}" loading="lazy" />
+              ${tagHtml}
+            </div>
+            <div class="ff-product-body">
+              <div class="ff-product-cat">${p.category}</div>
+              <h3 class="ff-product-name">${p.name}</h3>
+              <div class="ff-product-rating">
+                <span class="ff-stars" aria-hidden="true">${stars}</span>
+                <span class="ff-rating-count">(${p.ratingCount})</span>
+              </div>
+              <div class="ff-product-price">
+                <span class="ff-price">${formatMoney(p.price)}</span>
+                ${compareHtml}
+              </div>
+              <div class="ff-product-actions">
+                <button type="button" class="ff-btn-add" data-ff-add="${p.id}">
+                  <i class="fa-solid fa-plus me-1"></i> Add
+                </button>
+                <span class="ff-badge-ghost">Secure checkout</span>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        // Add-to-cart handlers
+        const addButtons = Array.from(grid.querySelectorAll("button[data-ff-add]"));
+        addButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const productId = btn.getAttribute("data-ff-add");
+            if (!productId) return;
+            addToCart(productId);
+          });
+        });
+
+        loadMoreBtn.style.display = filtered.length > slice.length ? "inline-flex" : "none";
+      }
+
+      loadMoreBtn.addEventListener("click", () => {
+        visibleCount += 8;
+        renderGrid();
+      });
+
+      cartToggleBtn.addEventListener("click", () => {
+        cartOpen = !cartOpen;
+        renderCart();
+      });
+
+      cartClearBtn.addEventListener("click", () => {
+        clearCart();
+      });
+
+      cartPanel.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const mode = target.getAttribute("data-ff-qty");
+        const id = target.getAttribute("data-ff-id");
+        if (!mode || !id) return;
+        const current = Number(cart[id] || 0);
+        if (mode === "inc") setQty(id, current + 1);
+        if (mode === "dec") setQty(id, current - 1);
+      });
+
+      async function checkoutWithRazorpay() {
+        const items = getCartItems();
+        if (!items.length) {
+          alert("Your cart is empty.");
+          return;
+        }
+
+        if (!window.Razorpay) {
+          alert("Razorpay failed to load. Please refresh and try again.");
+          return;
+        }
+
+        if (!RAZORPAY_KEY_ID || RAZORPAY_KEY_ID.includes("REPLACE_WITH_YOUR_RAZORPAY_KEY_ID")) {
+          alert(
+            "Set your Razorpay Key ID in index.html (RAZORPAY_KEY_ID) before checkout.\n\n" +
+              "Razorpay Dashboard → Settings → API Keys → Key ID"
+          );
+          return;
+        }
+
+        // Many payment gateways prefer https/http. If you're opening via file://, use a local server.
+        if (location.protocol === "file:") {
+          const ok = confirm(
+            "You're opening this page using file://.\n\n" +
+              "If Razorpay checkout doesn't open, run a local web server (recommended):\n" +
+              "python -m http.server 8000\n\n" +
+              "Continue anyway?"
+          );
+          if (!ok) return;
+        }
+
+        cartCheckoutBtn.disabled = true;
+        const prev = cartCheckoutBtn.innerHTML;
+        cartCheckoutBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-1"></i> Processing…';
+
+        const finish = () => {
+          cartCheckoutBtn.disabled = false;
+          cartCheckoutBtn.innerHTML = prev;
+        };
+
+        try {
+          // HTML-only checkout: we do NOT create an Order on the server.
+          // This works for demos / local prototypes, but does NOT provide server-side verification.
+          const total = getCartTotal();
+          const amountPaise = Math.max(1, Math.round(total * 100));
+          const payloadItems = items.map((i) => ({ id: i.product.id, name: i.product.name, quantity: i.quantity }));
+          const themeColor =
+            getComputedStyle(document.documentElement).getPropertyValue("--ff-red").trim() || "#e3063b";
+
+          const options = {
+            key: RAZORPAY_KEY_ID,
+            amount: amountPaise,
+            currency: "INR",
+            name: "FitFirst",
+            description: "Shop Checkout",
+            notes: {
+              cart_items: JSON.stringify(payloadItems),
+            },
+            handler: function (response) {
+              clearCart();
+              cartOpen = false;
+              renderCart();
+              finish();
+              alert(
+                "Payment successful!\n\n" +
+                  "Payment ID: " +
+                  (response?.razorpay_payment_id || "(unknown)")
+              );
+            },
+            modal: {
+              ondismiss: function () {
+                finish();
+              },
+            },
+            theme: { color: themeColor },
+          };
+
+          const rzp = new window.Razorpay(options);
+          rzp.on("payment.failed", function () {
+            finish();
+            alert("Payment failed. Please try again.");
+          });
+          rzp.open();
+        } catch (e) {
+          console.error(e);
+          finish();
+          alert("Checkout error: " + (e?.message || "Unknown error"));
+        }
+      }
+
+      cartCheckoutBtn.addEventListener("click", () => {
+        checkoutWithRazorpay();
+      });
+
+      renderCategoryBar();
+      renderGrid();
+      renderCart();
+    }
+
+    initMainTabs();
+    initShop();
+  </script>
+</body>
+</html>

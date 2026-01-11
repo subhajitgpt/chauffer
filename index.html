@@ -214,6 +214,15 @@
           </div>
 
           <div id="msg" class="msg">Loading…</div>
+
+          <div id="driversPanel" class="card" style="margin-top: 12px; display:none;">
+            <div style="display:flex; align-items:center; justify-content: space-between; gap: 10px;">
+              <div style="font-weight: 850;">Choose Your Driver</div>
+              <button id="closeDrivers" class="btn ghost small" type="button">Hide</button>
+            </div>
+            <div id="driversStatus" class="hint" style="margin-top: 6px;">Available drivers will appear here.</div>
+            <div id="driversList" style="margin-top: 10px; display:grid; gap: 10px;"></div>
+          </div>
         </div>
       </div>
 
@@ -317,6 +326,10 @@
       localStorage.setItem("chauffer_db", JSON.stringify(db));
     }
 
+    function uid(prefix) {
+      return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1e9)}`;
+    }
+
     function getSession() {
       return JSON.parse(localStorage.getItem("chauffer_session") || "null");
     }
@@ -394,6 +407,27 @@
     let pickupMarker = null;
     let dropMarker = null;
 
+    let trafficLayer = null;
+
+    // Driver selection (single-file demo)
+    const DRIVERS = [
+      { id: "d1", name: "Rajesh Kumar", rating: 4.9, trips: 523, years: 5, city: "Delhi NCR", pricePerHour: 199, verified: true },
+      { id: "d2", name: "Amit Singh", rating: 4.8, trips: 341, years: 3, city: "Mumbai", pricePerHour: 249, verified: true },
+      { id: "d3", name: "Suresh Yadav", rating: 4.7, trips: 892, years: 8, city: "Bangalore", pricePerHour: 179, verified: true },
+      { id: "d4", name: "Vikram Mehta", rating: 4.6, trips: 215, years: 4, city: "Pune", pricePerHour: 209, verified: true },
+      { id: "d5", name: "Imran Khan", rating: 4.8, trips: 610, years: 6, city: "Hyderabad", pricePerHour: 189, verified: true },
+      { id: "d6", name: "Rohit Sharma", rating: 4.7, trips: 455, years: 5, city: "Chennai", pricePerHour: 199, verified: true },
+    ];
+
+    let activeBookingId = null;
+    let acceptanceTimerId = null;
+
+    // Driver movement simulation
+    let driverMarker = null;
+    let driverSimTimer = null;
+    let driverSimBookingId = null;
+    let driverRouteLine = null;
+
     // Location tracking
     let geoWatchId = null;
     let userMarker = null;
@@ -408,11 +442,359 @@
       $("findBtn").disabled = !ok;
     }
 
+    function showDriversPanel(show) {
+      const panel = $("driversPanel");
+      if (!panel) return;
+      panel.style.display = show ? "block" : "none";
+    }
+
+    function setDriversStatus(text) {
+      const el = $("driversStatus");
+      if (el) el.textContent = text;
+    }
+
+    function getBookingById(db, bookingId) {
+      const list = db.bookings || [];
+      return list.find((b) => b && b.id === bookingId) || null;
+    }
+
+    function updateBooking(db, bookingId, patch) {
+      db.bookings = db.bookings || [];
+      const idx = db.bookings.findIndex((b) => b && b.id === bookingId);
+      if (idx < 0) return null;
+      db.bookings[idx] = { ...db.bookings[idx], ...patch };
+      return db.bookings[idx];
+    }
+
+    function renderDriversList(bookingId) {
+      const listEl = $("driversList");
+      if (!listEl) return;
+      listEl.innerHTML = "";
+
+      const db = getDb();
+      const booking = getBookingById(db, bookingId);
+
+      for (const d of DRIVERS) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.style.padding = "12px";
+
+        const top = document.createElement("div");
+        top.style.display = "flex";
+        top.style.justifyContent = "space-between";
+        top.style.alignItems = "center";
+        top.style.gap = "10px";
+
+        const left = document.createElement("div");
+        left.innerHTML = `
+          <div style="font-weight:850;">${d.name} ${d.verified ? '<span class="pill" style="margin-left:6px;">Verified</span>' : ''}</div>
+          <div class="muted" style="margin-top:4px; font-size: 13px;">⭐ ${d.rating} • ${d.trips} trips • ${d.years}+ yrs • ${d.city}</div>
+          <div style="margin-top:8px;"><span class="pill">₹${d.pricePerHour} / hour</span></div>
+        `;
+
+        const btn = document.createElement("button");
+        btn.className = "btn primary small";
+        btn.type = "button";
+        btn.textContent = "Request";
+
+        const status = booking?.status;
+        const selectedId = booking?.driver?.id;
+        if (status === "accepted" && selectedId === d.id) {
+          btn.textContent = "Accepted";
+          btn.disabled = true;
+        } else if (status === "arrived" && selectedId === d.id) {
+          btn.textContent = "Arrived";
+          btn.disabled = true;
+        } else if (status === "requested") {
+          btn.textContent = selectedId === d.id ? "Requested" : "Request";
+          btn.disabled = true; // lock selection while pending
+        } else if (status === "accepted") {
+          btn.disabled = true; // one accepted driver per booking
+        } else if (status === "arrived") {
+          btn.disabled = true;
+        }
+
+        btn.addEventListener("click", () => requestDriverForBooking(bookingId, d));
+
+        top.appendChild(left);
+        top.appendChild(btn);
+        card.appendChild(top);
+        listEl.appendChild(card);
+      }
+    }
+
+    function requestDriverForBooking(bookingId, driver) {
+      if (!isAuthed()) {
+        showLogin(true);
+        setLoginMsg("Login required to request a driver.");
+        return;
+      }
+
+      const db = getDb();
+      const booking = getBookingById(db, bookingId);
+      if (!booking) {
+        setMsg("No active booking found.");
+        return;
+      }
+
+      if (booking.status === "accepted") {
+        setDriversStatus(`Driver already accepted: ${booking.driver?.name || ""}`);
+        return;
+      }
+
+      updateBooking(db, bookingId, {
+        status: "requested",
+        driver: { id: driver.id, name: driver.name, rating: driver.rating, pricePerHour: driver.pricePerHour },
+        requestedAt: Date.now(),
+      });
+      setDb(db);
+
+      setDriversStatus(`Request sent to ${driver.name}. Waiting for acceptance…`);
+      renderDriversList(bookingId);
+
+      if (acceptanceTimerId) {
+        clearTimeout(acceptanceTimerId);
+        acceptanceTimerId = null;
+      }
+
+      // Simulate acceptance (demo)
+      const delayMs = 3000 + Math.floor(Math.random() * 5000);
+      acceptanceTimerId = setTimeout(() => {
+        const db2 = getDb();
+        const b2 = getBookingById(db2, bookingId);
+        if (!b2 || b2.status !== "requested" || b2.driver?.id !== driver.id) return;
+        updateBooking(db2, bookingId, { status: "accepted", acceptedAt: Date.now() });
+        setDb(db2);
+        setDriversStatus(`Accepted by ${driver.name}. Driver is on the way.`);
+        renderDriversList(bookingId);
+
+        // Start simulated driver movement towards pickup.
+        try {
+          startDriverSimulationTowardPickup(bookingId);
+        } catch (_) {
+          // ignore
+        }
+      }, delayMs);
+    }
+
+    function stopDriverSimulation() {
+      if (driverSimTimer) {
+        clearInterval(driverSimTimer);
+        driverSimTimer = null;
+      }
+      driverSimBookingId = null;
+
+      if (driverRouteLine) {
+        try { driverRouteLine.setMap(null); } catch (_) {}
+        driverRouteLine = null;
+      }
+    }
+
+    function getDistanceMeters(a, b) {
+      try {
+        if (google?.maps?.geometry?.spherical?.computeDistanceBetween) {
+          return google.maps.geometry.spherical.computeDistanceBetween(a, b);
+        }
+      } catch (_) {}
+      // Fallback haversine
+      const R = 6371000;
+      const toRad = (x) => (x * Math.PI) / 180;
+      const lat1 = a.lat();
+      const lon1 = a.lng();
+      const lat2 = b.lat();
+      const lon2 = b.lng();
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const sLat1 = toRad(lat1);
+      const sLat2 = toRad(lat2);
+      const h =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(sLat1) * Math.cos(sLat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+    }
+
+    function interpolateLatLng(a, b, t) {
+      const lat = a.lat() + (b.lat() - a.lat()) * t;
+      const lng = a.lng() + (b.lng() - a.lng()) * t;
+      return new google.maps.LatLng(lat, lng);
+    }
+
+    function interpolateSpherical(a, b, t) {
+      try {
+        if (google?.maps?.geometry?.spherical?.interpolate) {
+          return google.maps.geometry.spherical.interpolate(a, b, t);
+        }
+      } catch (_) {}
+      return interpolateLatLng(a, b, t);
+    }
+
+    function computeHeading(a, b) {
+      try {
+        if (google?.maps?.geometry?.spherical?.computeHeading) {
+          return google.maps.geometry.spherical.computeHeading(a, b);
+        }
+      } catch (_) {}
+      return 0;
+    }
+
+    function ensureDriverMarker(startLatLng) {
+      if (!map) throw new Error("Map not ready");
+      if (!driverMarker) {
+        driverMarker = new google.maps.Marker({
+          map,
+          position: startLatLng,
+          title: "Driver",
+          label: { text: "🚗", fontSize: "14px" },
+          icon: {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            scale: 5,
+            fillColor: "#2b6cff",
+            fillOpacity: 1,
+            strokeColor: "#ffffff",
+            strokeWeight: 2,
+            rotation: 0,
+          },
+        });
+      } else {
+        driverMarker.setMap(map);
+        driverMarker.setPosition(startLatLng);
+      }
+    }
+
+    async function startDriverSimulationTowardPickup(bookingId) {
+      if (!pickupPlace?.geometry?.location) return;
+
+      const db = getDb();
+      const booking = getBookingById(db, bookingId);
+      if (!booking || booking.status !== "accepted") return;
+
+      stopDriverSimulation();
+      driverSimBookingId = bookingId;
+
+      const pickupLatLng = pickupPlace.geometry.location;
+      // Start a short distance away with a small random offset.
+      const start = new google.maps.LatLng(
+        pickupLatLng.lat() + (Math.random() - 0.5) * 0.02,
+        pickupLatLng.lng() + (Math.random() - 0.5) * 0.02
+      );
+
+      ensureDriverMarker(start);
+
+      // Get a real road route from driver start -> pickup.
+      let routePath = null;
+      try {
+        if (!directionsService) throw new Error("DirectionsService not ready");
+        const res = await directionsService.route({
+          origin: start,
+          destination: pickupLatLng,
+          travelMode: google.maps.TravelMode.DRIVING,
+          drivingOptions: {
+            departureTime: new Date(),
+            trafficModel: google.maps.TrafficModel.BEST_GUESS,
+          },
+        });
+        routePath = res.routes?.[0]?.overview_path || null;
+      } catch (_) {
+        routePath = null;
+      }
+
+      if (!Array.isArray(routePath) || routePath.length < 2) {
+        // Fallback: straight-line if route isn't available.
+        routePath = [start, pickupLatLng];
+      }
+
+      // Show a subtle driver route line (optional but helps visually).
+      try {
+        driverRouteLine = new google.maps.Polyline({
+          path: routePath,
+          map,
+          strokeColor: "#2b6cff",
+          strokeOpacity: 0.35,
+          strokeWeight: 4,
+        });
+      } catch (_) {
+        driverRouteLine = null;
+      }
+
+      // Animate along the route path.
+      let segIndex = 0;
+      let segT = 0;
+      const speedMps = 18; // ~65 km/h equivalent for demo
+
+      driverSimTimer = setInterval(() => {
+        try {
+          const db2 = getDb();
+          const b2 = getBookingById(db2, bookingId);
+          if (!b2 || (b2.status !== "accepted" && b2.status !== "arrived")) {
+            stopDriverSimulation();
+            return;
+          }
+          if (b2.status === "arrived") {
+            stopDriverSimulation();
+            return;
+          }
+
+          let current = driverMarker?.getPosition();
+          if (!current) current = routePath[0];
+
+          const distToPickup = getDistanceMeters(current, pickupLatLng);
+          if (distToPickup <= 35 || segIndex >= routePath.length - 1) {
+            updateBooking(db2, bookingId, { status: "arrived", arrivedAt: Date.now() });
+            setDb(db2);
+            setDriversStatus(`Driver arrived at pickup: ${b2.driver?.name || ""}`);
+            renderDriversList(bookingId);
+            setMsg("Driver arrived at pickup.");
+            stopDriverSimulation();
+            return;
+          }
+
+          let remainingMove = speedMps; // per 1s tick
+          let newPos = current;
+
+          while (remainingMove > 0 && segIndex < routePath.length - 1) {
+            const a = routePath[segIndex];
+            const b = routePath[segIndex + 1];
+            const segLen = Math.max(1, getDistanceMeters(a, b));
+            const segRemaining = segLen * (1 - segT);
+
+            if (remainingMove < segRemaining) {
+              segT = segT + (remainingMove / segLen);
+              newPos = interpolateSpherical(a, b, segT);
+              remainingMove = 0;
+            } else {
+              // jump to end of segment
+              newPos = b;
+              remainingMove -= segRemaining;
+              segIndex += 1;
+              segT = 0;
+            }
+          }
+
+          // Update heading (nice touch)
+          try {
+            const nextTarget = routePath[Math.min(segIndex + 1, routePath.length - 1)];
+            const heading = computeHeading(newPos, nextTarget);
+            const icon = driverMarker.getIcon();
+            if (icon && typeof icon === "object") {
+              driverMarker.setIcon({ ...icon, rotation: heading });
+            }
+          } catch (_) {}
+
+          driverMarker.setPosition(newPos);
+          if (segIndex % 8 === 0) {
+            try { map.panTo(newPos); } catch (_) {}
+          }
+        } catch (_) {
+          // ignore
+        }
+      }, 1000);
+    }
+
     function loadGoogleMaps(key) {
       return new Promise((resolve, reject) => {
         if (window.google && window.google.maps) return resolve();
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=places`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=places,geometry`;
         script.async = true;
         script.defer = true;
         script.onload = () => resolve();
@@ -546,6 +928,10 @@ def estimate_fare(distance_km: float, duration_min: float, trip_type: str) -> fl
         origin: pickupPlace.geometry.location,
         destination: dropPlace.geometry.location,
         travelMode: google.maps.TravelMode.DRIVING,
+        drivingOptions: {
+          departureTime: new Date(),
+          trafficModel: google.maps.TrafficModel.BEST_GUESS,
+        },
       };
 
       const res = await directionsService.route(request);
@@ -553,10 +939,21 @@ def estimate_fare(distance_km: float, duration_min: float, trip_type: str) -> fl
       if (!leg) throw new Error("No route found");
 
       $("dist").textContent = leg.distance?.text || "—";
-      $("dur").textContent = leg.duration?.text || "—";
+
+      // Prefer live-traffic duration when available.
+      const durTraffic = leg.duration_in_traffic;
+      const durNormal = leg.duration;
+      if (durTraffic?.text) {
+        $("dur").textContent = `${durTraffic.text} (traffic)`;
+      } else {
+        $("dur").textContent = durNormal?.text || "—";
+      }
 
       const distanceKm = (leg.distance?.value || 0) / 1000;
-      const durationMin = (leg.duration?.value || 0) / 60;
+
+      // Use traffic seconds if available, otherwise normal.
+      const durationSeconds = (durTraffic?.value ?? durNormal?.value ?? 0);
+      const durationMin = durationSeconds / 60;
 
       const fare = await pyodide.runPythonAsync(`estimate_fare(${distanceKm}, ${durationMin}, "${tripType}")`);
       $("fare").textContent = `₹${fare}`;
@@ -640,9 +1037,13 @@ def estimate_fare(distance_km: float, duration_min: float, trip_type: str) -> fl
         const session = getSession();
         const db = getDb();
         db.bookings = db.bookings || [];
+        const bookingId = uid("bk");
+        activeBookingId = bookingId;
         db.bookings.push({
+          id: bookingId,
           phone: session.phone,
           createdAt: Date.now(),
+          status: "created",
           tripType,
           pickupText: $("pickup").value,
           dropText: $("drop").value,
@@ -653,7 +1054,12 @@ def estimate_fare(distance_km: float, duration_min: float, trip_type: str) -> fl
         });
         setDb(db);
 
-        setMsg("Request captured (local). Next step would be driver selection.");
+        // Show driver selection
+        showDriversPanel(true);
+        setDriversStatus("Select a driver to send a request.");
+        renderDriversList(bookingId);
+
+        setMsg("Request captured (local). Choose a driver below.");
       } catch (e) {
         setMsg(e.message || String(e));
       }
@@ -716,6 +1122,10 @@ def estimate_fare(distance_km: float, duration_min: float, trip_type: str) -> fl
           streetViewControl: false,
           fullscreenControl: false,
         });
+
+        // Show live traffic overlay.
+        trafficLayer = new google.maps.TrafficLayer();
+        trafficLayer.setMap(map);
 
         geocoder = new google.maps.Geocoder();
 
@@ -802,6 +1212,33 @@ def estimate_fare(distance_km: float, duration_min: float, trip_type: str) -> fl
 
         updateButtons();
         setMsg("Ready.");
+
+        // Driver panel controls + restore last booking state
+        $("closeDrivers").addEventListener("click", () => showDriversPanel(false));
+
+        try {
+          const session = getSession();
+          if (session?.phone) {
+            const db = getDb();
+            const last = (db.bookings || []).slice().reverse().find((b) => b && b.phone === session.phone);
+            if (last && (last.status === "requested" || last.status === "accepted" || last.status === "arrived")) {
+              activeBookingId = last.id;
+              showDriversPanel(true);
+              if (last.status === "accepted") {
+                setDriversStatus(`Accepted by ${last.driver?.name || "driver"}.`);
+                // If pickupPlace is available (in this session), resume movement simulation.
+                try { startDriverSimulationTowardPickup(last.id); } catch (_) {}
+              } else if (last.status === "arrived") {
+                setDriversStatus(`Driver arrived at pickup: ${last.driver?.name || "driver"}.`);
+              } else {
+                setDriversStatus(`Request sent to ${last.driver?.name || "driver"}. Waiting for acceptance…`);
+              }
+              renderDriversList(last.id);
+            }
+          }
+        } catch (_) {
+          // ignore restore errors
+        }
       } catch (e) {
         setMsg(e.message || String(e));
       }
